@@ -34,12 +34,16 @@ export default function Header() {
           </Link>
         </div>
 
-        <nav className="hidden flex-1 items-center justify-center gap-3 text-sm font-medium lg:flex">
+        <div className="text-[10px] border p-1 border-green-500 rounded-2xl">
+          beta
+        </div>
+
+        <nav className="hidden flex-1 items-center justify-center gap-3 text-sm font-medium lg:flex ">
           {navLinks.map((link) => (
             <Link
               key={link.id}
               to={link.to}
-              className="relative overflow-hidden rounded-xl px-3 py-1 text-sm font-semibold text-slate-200 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+              className="relative overflow-hidden rounded-xl px-3 py-1 text-sm font-semibold text-slate-200 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 hover:bg-accent"
             >
               <span className="relative z-10">{link.name}</span>
               <span className="absolute inset-0 -translate-y-full bg-gradient-to-r from-emerald-500/40 via-emerald-500/20 to-sky-500/40 transition-transform duration-300 group-hover:translate-y-0" />
