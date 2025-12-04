@@ -1,0 +1,24 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
+.vite/
+coverage/
+
+# Env files
+.env
+.env.*
+
+# Editors/OS
+.vscode/
+.idea/
+*.DS_Store
+
+# Workspaces
+frontend/node_modules/
+frontend/dist/
+backend/node_modules/
+backend/dist/
