@@ -13,7 +13,6 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-linear-to-b from-background/95 to-background/70 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
         <Link
           to="/"
           className="group flex items-center gap-2 text-lg font-semibold tracking-tight"
@@ -29,7 +28,6 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Center nav + search on desktop */}
         <div className="hidden flex-1 items-center justify-center gap-6 md:flex">
           <nav className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             {navlinks.map((link) => (
@@ -83,30 +81,27 @@ export default function Header() {
           <div className="w-32 md:hidden">
             <SearchTab />
           </div>
-          <Link
-            to="/login"
+          <a
+            href="/login"
             className="hidden md:inline-flex rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             Continue to app
-          </Link>
-          <Link
-            to="/register"
+          </a>
+          <a
+            href="/register"
             className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
           >
             Sign up
-          </Link>
+          </a>
         </div>
       </div>
 
-      {/* Mobile menu sheet */}
       {menuOpen && (
         <div className="md:hidden">
-          {/* backdrop */}
           <div
             className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
             onClick={() => setMenuOpen(false)}
           />
-          {/* sheet */}
           <div className="fixed left-0 top-0 z-50 h-full w-72 border-r border-border bg-background shadow-lg">
             <div className="flex h-16 items-center justify-between px-4">
               <Link
@@ -152,20 +147,20 @@ export default function Header() {
               ))}
             </nav>
             <div className="border-t border-border p-3">
-              <Link
-                to="/login"
+              <a
+                href="/login"
                 className="inline-flex w-full items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 onClick={() => setMenuOpen(false)}
               >
                 Continue to app
-              </Link>
-              <Link
-                to="/register"
+              </a>
+              <a
+                href="/register"
                 className="mt-2 inline-flex w-full items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
                 onClick={() => setMenuOpen(false)}
               >
                 Sign up
-              </Link>
+              </a>
             </div>
           </div>
         </div>
