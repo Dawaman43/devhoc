@@ -62,6 +62,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+  try {
+    var key = 'vite-ui-theme';
+    var stored = localStorage.getItem(key);
+    var theme = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var root = document.documentElement;
+    root.classList.remove('light','dark');
+    root.classList.add(theme);
+  } catch (e) {
+    // ignore
+  }
+})();`,
+          }}
+        />
       </head>
       <body>
         <Header />

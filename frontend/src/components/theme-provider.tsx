@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react'
 
 type Theme = 'dark' | 'light' | 'system'
 
@@ -29,7 +35,21 @@ export function ThemeProvider({
   // Initialize theme with defaultTheme on the server to avoid accessing
   // browser-only APIs (localStorage/window) during SSR. We will read
   // persisted value on mount and update state accordingly.
-  const [theme, setTheme] = useState<Theme>(() => defaultTheme)
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(storageKey) as Theme | null
+        if (stored) return stored
+        if (defaultTheme === 'system') {
+          const prefersDark = window.matchMedia(
+            '(prefers-color-scheme: dark)',
+          ).matches
+          return prefersDark ? 'dark' : 'light'
+        }
+      } catch {}
+    }
+    return defaultTheme
+  })
 
   // On mount, read stored preference (if any) and update state.
   useEffect(() => {
@@ -49,7 +69,7 @@ export function ThemeProvider({
   }, [storageKey])
 
   // Update the document class when `theme` changes (client-only).
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof window === 'undefined') return
 
     const root = window.document.documentElement
