@@ -85,13 +85,13 @@ export default function Header() {
           <div className="hidden items-center gap-2 md:flex">
             <ModeToggle />
             <Link
-              to="/login"
+              to="/auth/login"
               className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
             >
               Continue to app
             </Link>
             <Link
-              to="/register"
+              to="/auth/register"
               className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
             >
               Sign up
@@ -155,14 +155,14 @@ export default function Header() {
                 <ModeToggle />
               </div>
               <Link
-                to="/login"
+                to="/auth/login"
                 className="inline-flex w-full items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 onClick={() => setMenuOpen(false)}
               >
                 Continue to app
               </Link>
               <Link
-                to="/register"
+                to="/auth/register"
                 className="mt-2 inline-flex w-full items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
                 onClick={() => setMenuOpen(false)}
               >
