@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import SearchTab from './Search'
+import { ModeToggle } from './mode-toggle'
 
 const navlinks = [
   { to: '/', label: 'Home' },
@@ -81,18 +82,21 @@ export default function Header() {
           <div className="w-32 md:hidden">
             <SearchTab />
           </div>
-          <a
-            href="/login"
-            className="hidden md:inline-flex rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            Continue to app
-          </a>
-          <a
-            href="/register"
-            className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
-          >
-            Sign up
-          </a>
+          <div className="hidden items-center gap-2 md:flex">
+            <ModeToggle />
+            <Link
+              to="/login"
+              className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              Continue to app
+            </Link>
+            <Link
+              to="/register"
+              className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+            >
+              Sign up
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -147,20 +151,23 @@ export default function Header() {
               ))}
             </nav>
             <div className="border-t border-border p-3">
-              <a
-                href="/login"
+              <div className="mb-3 flex items-center justify-center">
+                <ModeToggle />
+              </div>
+              <Link
+                to="/login"
                 className="inline-flex w-full items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 onClick={() => setMenuOpen(false)}
               >
                 Continue to app
-              </a>
-              <a
-                href="/register"
+              </Link>
+              <Link
+                to="/register"
                 className="mt-2 inline-flex w-full items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
                 onClick={() => setMenuOpen(false)}
               >
                 Sign up
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -26,13 +26,33 @@ export function ThemeProvider({
   storageKey = 'vite-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
-  )
+  // Initialize theme with defaultTheme on the server to avoid accessing
+  // browser-only APIs (localStorage/window) during SSR. We will read
+  // persisted value on mount and update state accordingly.
+  const [theme, setTheme] = useState<Theme>(() => defaultTheme)
 
+  // On mount, read stored preference (if any) and update state.
   useEffect(() => {
-    const root = window.document.documentElement
+    if (typeof window === 'undefined') return
 
+    try {
+      const stored = localStorage.getItem(storageKey) as Theme | null
+      if (stored) {
+        setTheme(stored)
+        return
+      }
+    } catch (e) {
+      // ignore localStorage errors
+    }
+
+    // If no stored value, keep defaultTheme (which may be 'system')
+  }, [storageKey])
+
+  // Update the document class when `theme` changes (client-only).
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const root = window.document.documentElement
     root.classList.remove('light', 'dark')
 
     if (theme === 'system') {
@@ -51,7 +71,13 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(storageKey, theme)
+        } catch (e) {
+          // ignore
+        }
+      }
       setTheme(theme)
     },
   }
