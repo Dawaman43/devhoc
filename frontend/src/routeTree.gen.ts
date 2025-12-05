@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +23,11 @@ import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
+  '/pricing': typeof PricingRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
+  '/pricing': typeof PricingRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
+  '/pricing': typeof PricingRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/categories'
     | '/contact'
+    | '/pricing'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/categories'
     | '/contact'
+    | '/pricing'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/categories'
     | '/contact'
+    | '/pricing'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CategoriesRoute: typeof CategoriesRoute
   ContactRoute: typeof ContactRoute
+  PricingRoute: typeof PricingRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -188,6 +201,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CategoriesRoute: CategoriesRoute,
   ContactRoute: ContactRoute,
+  PricingRoute: PricingRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
