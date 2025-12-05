@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SnippetsRouteImport } from './routes/snippets'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -17,10 +18,14 @@ import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AskRouteImport } from './routes/ask'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SnippetsIndexRouteImport } from './routes/snippets/index'
+import { Route as SnippetsNewRouteImport } from './routes/snippets/new'
+import { Route as SnippetsSnippetIdRouteImport } from './routes/snippets/$snippetId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthAuthTypeRouteImport } from './routes/auth/$authType'
+import { Route as SnippetsSnippetIdEditorRouteImport } from './routes/snippets/$snippetId/editor'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
@@ -33,6 +38,11 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SnippetsRoute = SnippetsRouteImport.update({
+  id: '/snippets',
+  path: '/snippets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -70,6 +80,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SnippetsIndexRoute = SnippetsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SnippetsRoute,
+} as any)
+const SnippetsNewRoute = SnippetsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => SnippetsRoute,
+} as any)
+const SnippetsSnippetIdRoute = SnippetsSnippetIdRouteImport.update({
+  id: '/$snippetId',
+  path: '/$snippetId',
+  getParentRoute: () => SnippetsRoute,
+} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
@@ -89,6 +114,11 @@ const AuthAuthTypeRoute = AuthAuthTypeRouteImport.update({
   id: '/$authType',
   path: '/$authType',
   getParentRoute: () => AuthRoute,
+} as any)
+const SnippetsSnippetIdEditorRoute = SnippetsSnippetIdEditorRouteImport.update({
+  id: '/editor',
+  path: '/editor',
+  getParentRoute: () => SnippetsSnippetIdRoute,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
@@ -139,15 +169,20 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/snippets': typeof SnippetsRouteWithChildren
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
+  '/snippets/new': typeof SnippetsNewRoute
+  '/snippets/': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/snippets/$snippetId/editor': typeof SnippetsSnippetIdEditorRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -166,10 +201,14 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
+  '/snippets/new': typeof SnippetsNewRoute
+  '/snippets': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/snippets/$snippetId/editor': typeof SnippetsSnippetIdEditorRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -184,15 +223,20 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/snippets': typeof SnippetsRouteWithChildren
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
+  '/snippets/new': typeof SnippetsNewRoute
+  '/snippets/': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/snippets/$snippetId/editor': typeof SnippetsSnippetIdEditorRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -208,15 +252,20 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pricing'
     | '/privacy'
+    | '/snippets'
     | '/terms'
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
     | '/demo/tanstack-query'
+    | '/snippets/$snippetId'
+    | '/snippets/new'
+    | '/snippets/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/snippets/$snippetId/editor'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -235,10 +284,14 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/demo/tanstack-query'
+    | '/snippets/$snippetId'
+    | '/snippets/new'
+    | '/snippets'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/snippets/$snippetId/editor'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -252,15 +305,20 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pricing'
     | '/privacy'
+    | '/snippets'
     | '/terms'
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
     | '/demo/tanstack-query'
+    | '/snippets/$snippetId'
+    | '/snippets/new'
+    | '/snippets/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/snippets/$snippetId/editor'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -275,6 +333,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  SnippetsRoute: typeof SnippetsRouteWithChildren
   TermsRoute: typeof TermsRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
@@ -294,6 +353,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/snippets': {
+      id: '/snippets'
+      path: '/snippets'
+      fullPath: '/snippets'
+      preLoaderRoute: typeof SnippetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -345,6 +411,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/snippets/': {
+      id: '/snippets/'
+      path: '/'
+      fullPath: '/snippets/'
+      preLoaderRoute: typeof SnippetsIndexRouteImport
+      parentRoute: typeof SnippetsRoute
+    }
+    '/snippets/new': {
+      id: '/snippets/new'
+      path: '/new'
+      fullPath: '/snippets/new'
+      preLoaderRoute: typeof SnippetsNewRouteImport
+      parentRoute: typeof SnippetsRoute
+    }
+    '/snippets/$snippetId': {
+      id: '/snippets/$snippetId'
+      path: '/$snippetId'
+      fullPath: '/snippets/$snippetId'
+      preLoaderRoute: typeof SnippetsSnippetIdRouteImport
+      parentRoute: typeof SnippetsRoute
+    }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
       path: '/demo/tanstack-query'
@@ -372,6 +459,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/$authType'
       preLoaderRoute: typeof AuthAuthTypeRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/snippets/$snippetId/editor': {
+      id: '/snippets/$snippetId/editor'
+      path: '/editor'
+      fullPath: '/snippets/$snippetId/editor'
+      preLoaderRoute: typeof SnippetsSnippetIdEditorRouteImport
+      parentRoute: typeof SnippetsSnippetIdRoute
     }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
@@ -446,6 +540,33 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface SnippetsSnippetIdRouteChildren {
+  SnippetsSnippetIdEditorRoute: typeof SnippetsSnippetIdEditorRoute
+}
+
+const SnippetsSnippetIdRouteChildren: SnippetsSnippetIdRouteChildren = {
+  SnippetsSnippetIdEditorRoute: SnippetsSnippetIdEditorRoute,
+}
+
+const SnippetsSnippetIdRouteWithChildren =
+  SnippetsSnippetIdRoute._addFileChildren(SnippetsSnippetIdRouteChildren)
+
+interface SnippetsRouteChildren {
+  SnippetsSnippetIdRoute: typeof SnippetsSnippetIdRouteWithChildren
+  SnippetsNewRoute: typeof SnippetsNewRoute
+  SnippetsIndexRoute: typeof SnippetsIndexRoute
+}
+
+const SnippetsRouteChildren: SnippetsRouteChildren = {
+  SnippetsSnippetIdRoute: SnippetsSnippetIdRouteWithChildren,
+  SnippetsNewRoute: SnippetsNewRoute,
+  SnippetsIndexRoute: SnippetsIndexRoute,
+}
+
+const SnippetsRouteWithChildren = SnippetsRoute._addFileChildren(
+  SnippetsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AskRoute: AskRoute,
@@ -454,6 +575,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  SnippetsRoute: SnippetsRouteWithChildren,
   TermsRoute: TermsRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
