@@ -10,7 +10,8 @@
   "framework": "react-cra",
   "chosenAddOns": [
     "eslint",
-    "tanstack-query",
-    "start"
+    "shadcn",
+    "start",
+    "tanstack-query"
   ]
 }
