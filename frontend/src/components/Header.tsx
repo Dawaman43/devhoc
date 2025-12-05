@@ -12,8 +12,8 @@ const navlinks = [
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-linear-to-b from-background/95 to-background/70 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-screen border-b border-border bg-linear-to-b from-background/95 to-background/70 backdrop-blur supports-backdrop-filter:bg-background/80">
+      <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           to="/"
           className="group flex items-center gap-2 text-lg font-semibold tracking-tight"
