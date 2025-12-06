@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS likes (
   user_id TEXT NOT NULL,
   target_type TEXT NOT NULL, -- 'post' | 'comment'
   target_id TEXT NOT NULL,
+  emoji TEXT,
   created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
   UNIQUE(user_id, target_type, target_id)
 );
