@@ -99,6 +99,12 @@ export default function Header() {
             <ModeToggle />
             {isAuthenticated ? (
               <>
+                <Link
+                  to="/profile"
+                  className="rounded-full px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                >
+                  Profile
+                </Link>
                 <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
                   {displayName}
                 </span>

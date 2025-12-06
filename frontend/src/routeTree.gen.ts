@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SnippetsRouteImport } from './routes/snippets'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -50,6 +51,11 @@ const TermsRoute = TermsRouteImport.update({
 const SnippetsRoute = SnippetsRouteImport.update({
   id: '/snippets',
   path: '/snippets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/snippets': typeof SnippetsRouteWithChildren
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
@@ -278,6 +286,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/snippets': typeof SnippetsRouteWithChildren
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
@@ -314,6 +323,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pricing'
     | '/privacy'
+    | '/profile'
     | '/snippets'
     | '/terms'
     | '/auth/$authType'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pricing'
     | '/privacy'
+    | '/profile'
     | '/terms'
     | '/auth/$authType'
     | '/auth/login'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pricing'
     | '/privacy'
+    | '/profile'
     | '/snippets'
     | '/terms'
     | '/auth/$authType'
@@ -416,6 +428,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   SnippetsRoute: typeof SnippetsRouteWithChildren
   TermsRoute: typeof TermsRoute
   CategoriesCategoriesIdRoute: typeof CategoriesCategoriesIdRoute
@@ -451,6 +464,13 @@ declare module '@tanstack/react-router' {
       path: '/snippets'
       fullPath: '/snippets'
       preLoaderRoute: typeof SnippetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -714,6 +734,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   SnippetsRoute: SnippetsRouteWithChildren,
   TermsRoute: TermsRoute,
   CategoriesCategoriesIdRoute: CategoriesCategoriesIdRoute,

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { register as registerRequest, login as loginRequest } from '@/lib/api/auth'
+import {
+  register as registerRequest,
+  login as loginRequest,
+} from '@/lib/api/auth'
 import { useAuth } from '@/lib/auth/context'
 
 export default function Register() {
@@ -20,6 +23,10 @@ export default function Register() {
       setError('Please provide name, email and password.')
       return
     }
+    if (name.trim().length < 2) {
+      setError('Full name must be at least 2 characters.')
+      return
+    }
     if (password !== confirm) {
       setError('Passwords do not match.')
       return
@@ -32,7 +39,27 @@ export default function Register() {
       completeLogin(loginResult)
       navigate({ to: '/' })
     } catch (err: any) {
-      setError(err?.message || 'Registration failed')
+      // Try to parse structured validation errors from the server
+      let message = err?.message || 'Registration failed'
+      try {
+        const parsed = JSON.parse(message)
+        if (parsed?.fieldErrors) {
+          // Prefer the first field error we find
+          const firstField = Object.keys(parsed.fieldErrors)[0]
+          const firstMsg = parsed.fieldErrors[firstField]?.[0]
+          if (firstMsg) message = `${firstField}: ${firstMsg}`
+        } else if (parsed?.error) {
+          // zod.flatten() may put errors under `error`
+          message =
+            typeof parsed.error === 'string'
+              ? parsed.error
+              : JSON.stringify(parsed.error)
+        }
+      } catch {
+        // not JSON — keep original message
+      }
+
+      setError(message)
     } finally {
       setLoading(false)
     }
