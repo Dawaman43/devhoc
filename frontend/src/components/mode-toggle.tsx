@@ -6,16 +6,11 @@ import { useTheme } from '@/components/theme-provider'
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme()
-  const [systemTheme, setSystemTheme] = useState<'dark' | 'light'>(() =>
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light',
-  )
+  const [systemTheme, setSystemTheme] = useState<'dark' | 'light'>('dark')
 
   const getSystemTheme = () =>
     typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
+      window.matchMedia('(prefers-color-scheme: dark)').matches
       ? 'dark'
       : 'light'
 

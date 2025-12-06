@@ -3,6 +3,22 @@ import { z } from "zod";
 import { SignJWT, jwtVerify } from "jose";
 import type { Env } from "../index";
 
+function toBase64(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  // Use global btoa if available (Cloudflare Workers provide this)
+  if (typeof btoa === "function") return btoa(binary);
+  // Fallback: try Buffer if present
+  // @ts-ignore
+  if (typeof Buffer !== "undefined")
+    return Buffer.from(bytes).toString("base64");
+  throw new Error("No base64 encoder available");
+}
+
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -53,7 +69,7 @@ export function authRoutes() {
         keyMaterial,
         256
       );
-      const hash = Buffer.from(new Uint8Array(bits)).toString("base64");
+      const hash = toBase64(bits);
       const password_hash = `${salt}:${hash}`;
       const id = crypto.randomUUID();
       await c.env.DB.prepare(
@@ -100,7 +116,7 @@ export function authRoutes() {
         km,
         256
       );
-      const calc = Buffer.from(new Uint8Array(bits)).toString("base64");
+      const calc = toBase64(bits);
       if (calc !== stored) return c.json({ error: "invalid credentials" }, 401);
 
       const alg = "HS256";
