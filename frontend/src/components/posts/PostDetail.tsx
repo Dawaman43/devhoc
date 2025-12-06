@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { PostComments } from './PostComments'
+import PostReactions from './PostReactions'
 import type { ApiComment } from '@/lib/api/comments'
 import type { ApiPost } from '@/lib/api/posts'
 export type PostDetailData = ApiPost
@@ -42,6 +43,7 @@ export function PostDetail({
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <PostReactions postId={post.id} />
               <Button
                 variant="ghost"
                 size="sm"

@@ -10,11 +10,14 @@ export async function toggleLike(
   targetType: 'post' | 'comment',
   targetId: string,
   token?: string | null,
+  emoji?: string | null,
 ) {
+  const body: Record<string, any> = { targetType, targetId }
+  if (emoji) body.emoji = emoji
   return apiFetch<LikeResponse>(`/likes`, {
     method: 'POST',
     token,
-    body: JSON.stringify({ targetType, targetId }),
+    body: JSON.stringify(body),
   })
 }
 
@@ -22,7 +25,7 @@ export async function getLikeCount(
   targetType: 'post' | 'comment',
   targetId: string,
 ) {
-  return apiFetch<{ likes: number }>(
+  return apiFetch<{ likes: number; breakdown?: Record<string, number> }>(
     `/likes/count?targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`,
   )
 }
@@ -32,7 +35,7 @@ export async function getMyLike(
   targetId: string,
   token?: string | null,
 ) {
-  return apiFetch<{ liked: boolean }>(
+  return apiFetch<{ liked: boolean; emoji?: string | null }>(
     `/likes/my-like?targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`,
     { token },
   )
