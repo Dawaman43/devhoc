@@ -1,9 +1,10 @@
 import { apiFetch } from './client'
 
-export type VotePayload = {
-  targetType: 'post' | 'comment'
-  targetId: string
-  delta: 'up' | 'down'
+export type VoteResponse = {
+  ok: boolean
+  action?: 'created' | 'updated' | 'removed'
+  id?: string
+  value?: number
 }
 
 export type VoteCount = {
@@ -12,16 +13,26 @@ export type VoteCount = {
   score: number
 }
 
-export async function castVote(payload: VotePayload, token?: string | null) {
-  return apiFetch<{ ok: boolean; action: string; id?: string; value: number }>(`/votes`, {
+export async function voteOnTarget(
+  targetType: 'post' | 'comment',
+  targetId: string,
+  delta: 'up' | 'down',
+  token?: string | null,
+) {
+  return apiFetch<VoteResponse>(`/votes`, {
     method: 'POST',
-    body: JSON.stringify(payload),
     token,
+    body: JSON.stringify({ targetType, targetId, delta }),
   })
 }
 
-export async function getVoteCount(targetType: 'post' | 'comment', targetId: string) {
-  return apiFetch<VoteCount>(`/votes/count?targetType=${targetType}&targetId=${targetId}`)
+export async function getVoteCount(
+  targetType: 'post' | 'comment',
+  targetId: string,
+) {
+  return apiFetch<VoteCount>(
+    `/votes/count?targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`,
+  )
 }
 
 export async function getMyVote(
@@ -30,7 +41,7 @@ export async function getMyVote(
   token?: string | null,
 ) {
   return apiFetch<{ value: number | null }>(
-    `/votes/my-vote?targetType=${targetType}&targetId=${targetId}`,
+    `/votes/my-vote?targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`,
     { token },
   )
 }

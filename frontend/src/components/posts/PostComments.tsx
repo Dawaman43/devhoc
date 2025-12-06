@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth/context'
+import CommentVote from '@/components/comments/CommentVote'
 import {
   type ApiComment,
   fetchComments,
@@ -251,6 +252,7 @@ function CommentItem({
         {node.text}
       </div>
       <div className="mt-2 flex items-center gap-2">
+        <CommentVote commentId={node.id} rootId={node.rootId} />
         <Button
           variant="ghost"
           size="sm"

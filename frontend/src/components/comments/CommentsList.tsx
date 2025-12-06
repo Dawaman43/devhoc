@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import type { ApiComment } from '@/lib/api/comments'
+import CommentVote from './CommentVote'
 
 export function CommentsList({ comments }: { comments: ApiComment[] }) {
   const grouped = comments.reduce<Record<string, ApiComment[]>>((acc, c) => {
@@ -56,7 +57,14 @@ export function CommentsList({ comments }: { comments: ApiComment[] }) {
                       </div>
                     )}
                   </div>
-                  <div className="text-sm text-muted-foreground">{c.text}</div>
+                  <div className="mt-2 grid grid-cols-[1fr_auto] gap-4">
+                    <div className="text-sm text-muted-foreground">
+                      {c.text}
+                    </div>
+                    <div className="flex items-start">
+                      <CommentVote commentId={c.id} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
