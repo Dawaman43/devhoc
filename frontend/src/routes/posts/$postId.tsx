@@ -1,5 +1,6 @@
 import { createFileRoute, useParams } from '@tanstack/react-router'
 import { PostDetail } from '@/components/posts/PostDetail'
+import type { CommentThread } from '@/components/posts/PostComments'
 
 const demoContent: Record<
   string,
@@ -46,7 +47,41 @@ export const Route = createFileRoute('/posts/$postId')({
       content: 'This is a placeholder for an unknown post id.',
     }
 
-    return <PostDetail post={post} />
+    const demoCommentsByPost: Record<string, CommentThread[]> = {
+      'introducing-devhoc': [
+        {
+          id: 'c1',
+          author: 'Taylor',
+          text: 'Great write-up!',
+          createdAt: '2025-11-01',
+          replies: [
+            {
+              id: 'r1',
+              author: 'Alex',
+              text: 'Appreciate it!',
+              createdAt: '2025-11-02',
+            },
+          ],
+        },
+        {
+          id: 'c2',
+          author: 'Sam',
+          text: 'Congrats on the launch!',
+          createdAt: '2025-11-02',
+        },
+      ],
+      'tanstack-router': [
+        {
+          id: 'c3',
+          author: 'Morgan',
+          text: 'Would love more examples.',
+          createdAt: '2025-11-15',
+        },
+      ],
+    }
+    const initialComments = demoCommentsByPost[postId] ?? []
+
+    return <PostDetail post={post} comments={initialComments} />
   },
 })
 

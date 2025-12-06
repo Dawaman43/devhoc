@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { PostComments, CommentThread } from './PostComments'
 
 export type PostDetailData = {
   title: string
@@ -9,7 +10,13 @@ export type PostDetailData = {
   createdAt?: string
 }
 
-export function PostDetail({ post }: { post: PostDetailData }) {
+export function PostDetail({
+  post,
+  comments,
+}: {
+  post: PostDetailData
+  comments?: CommentThread[]
+}) {
   return (
     <article className="space-y-6">
       <div className="relative overflow-hidden rounded-xl border border-border bg-linear-to-b from-muted/30 to-background">
@@ -64,32 +71,7 @@ export function PostDetail({ post }: { post: PostDetailData }) {
         <p>{post.content}</p>
       </div>
 
-      <section className="space-y-3 rounded-xl border border-border bg-muted/20 p-4">
-        <h2 className="text-sm font-semibold">Comments</h2>
-        <div className="space-y-2">
-          {[
-            { author: 'Taylor', text: 'Great write-up!' },
-            { author: 'Morgan', text: 'Would love more examples.' },
-          ].map((c, i) => (
-            <div
-              key={i}
-              className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <div className="font-medium">{c.author}</div>
-              <div className="text-muted-foreground">{c.text}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          <input
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            placeholder="Leave a comment (mock)"
-          />
-          <Button size="sm" onClick={() => alert('Comment posted (mock)')}>
-            Post
-          </Button>
-        </div>
-      </section>
+      <PostComments initialComments={comments ?? []} />
     </article>
   )
 }
