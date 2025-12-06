@@ -73,6 +73,17 @@ CREATE TABLE IF NOT EXISTS likes (
 );
 CREATE INDEX IF NOT EXISTS idx_likes_target ON likes(target_type, target_id);
 
+-- Follows: allow users to follow other users (follower -> following)
+CREATE TABLE IF NOT EXISTS follows (
+  id TEXT PRIMARY KEY,
+  follower_id TEXT NOT NULL,
+  following_id TEXT NOT NULL,
+  created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+  UNIQUE(follower_id, following_id)
+);
+CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id);
+CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id);
+
 -- Notifications (optional)
 CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,

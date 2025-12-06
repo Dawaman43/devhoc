@@ -177,6 +177,64 @@ export function usersRoutes() {
               c.post_id AS postId,
               c.author_id AS authorId,
               COALESCE(u.name, c.author_id) AS authorName,
+
+    // Toggle follow/unfollow for a user (authenticated follower follows :userId)
+    r.post('/:userId/follow', async (c) => {
+      const user = (c as any).user as { id: string } | undefined;
+      if (!user?.id) return c.json({ error: 'missing auth' }, 401);
+      const { userId } = c.req.param();
+      if (userId === user.id) return c.json({ error: "can't follow yourself" }, 400);
+      try {
+        const existing = await c.env.DB.prepare(
+          'SELECT id FROM follows WHERE follower_id = ? AND following_id = ?'
+        )
+          .bind(user.id, userId)
+          .first<{ id: string }>();
+        if (existing) {
+          await c.env.DB.prepare('DELETE FROM follows WHERE id = ?').bind(existing.id).run();
+          return c.json({ ok: true, action: 'unfollowed' });
+        }
+        const id = crypto.randomUUID();
+        await c.env.DB.prepare(
+          'INSERT INTO follows (id, follower_id, following_id) VALUES (?, ?, ?)'
+        )
+          .bind(id, user.id, userId)
+          .run();
+        return c.json({ ok: true, action: 'followed', id });
+      } catch (err) {
+        console.error('follow toggle error', err);
+        return c.json({ error: String(err) }, 500);
+      }
+    });
+
+    // Followers count
+    r.get('/:userId/followers/count', async (c) => {
+      const { userId } = c.req.param();
+      const row = await c.env.DB.prepare('SELECT COUNT(1) as cnt FROM follows WHERE following_id = ?')
+        .bind(userId)
+        .first<{ cnt: number }>();
+      return c.json({ count: row?.cnt ?? 0 });
+    });
+
+    // Following count
+    r.get('/:userId/following/count', async (c) => {
+      const { userId } = c.req.param();
+      const row = await c.env.DB.prepare('SELECT COUNT(1) as cnt FROM follows WHERE follower_id = ?')
+        .bind(userId)
+        .first<{ cnt: number }>();
+      return c.json({ count: row?.cnt ?? 0 });
+    });
+
+    // Check if current user follows :userId
+    r.get('/:userId/following/me', async (c) => {
+      const user = (c as any).user as { id: string } | undefined;
+      if (!user?.id) return c.json({ following: false });
+      const { userId } = c.req.param();
+      const row = await c.env.DB.prepare('SELECT id FROM follows WHERE follower_id = ? AND following_id = ?')
+        .bind(user.id, userId)
+        .first<{ id: string }>();
+      return c.json({ following: !!row });
+    });
               c.text,
               c.parent_reply_id AS parentReplyId,
               c.created_at AS createdAt

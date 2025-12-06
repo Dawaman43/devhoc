@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Share2 } from 'lucide-react'
 import { PostComments } from './PostComments'
 import PostReactions from './PostReactions'
+import FollowButton from '@/components/profile/FollowButton'
 import type { ApiComment } from '@/lib/api/comments'
 import type { ApiPost } from '@/lib/api/posts'
 export type PostDetailData = ApiPost
@@ -23,8 +24,10 @@ export function PostDetail({
               <h1 className="text-2xl font-bold tracking-tight">
                 {post.title}
               </h1>
-              <div className="mt-1 text-xs text-muted-foreground">
-                by {post.authorName || 'Anonymous'}
+              <div className="mt-1 text-xs text-muted-foreground flex items-center gap-2">
+                <span>by {post.authorName || 'Anonymous'}</span>
+                {/* Follow button for the post author */}
+                {post.authorId && <FollowButton userId={post.authorId} />}
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
                 {!!post.tags?.length &&

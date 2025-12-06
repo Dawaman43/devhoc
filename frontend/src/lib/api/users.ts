@@ -21,6 +21,35 @@ export async function getUser(userId: string) {
   return apiFetch<ApiUser>(`/users/${userId}`)
 }
 
+export async function toggleFollow(userId: string, token?: string | null) {
+  return apiFetch<{ ok: boolean; action: 'followed' | 'unfollowed' }>(
+    `/users/${encodeURIComponent(userId)}/follow`,
+    {
+      method: 'POST',
+      token,
+    },
+  )
+}
+
+export async function getFollowersCount(userId: string) {
+  return apiFetch<{ count: number }>(
+    `/users/${encodeURIComponent(userId)}/followers/count`,
+  )
+}
+
+export async function getFollowingCount(userId: string) {
+  return apiFetch<{ count: number }>(
+    `/users/${encodeURIComponent(userId)}/following/count`,
+  )
+}
+
+export async function isFollowingMe(userId: string, token?: string | null) {
+  return apiFetch<{ following: boolean }>(
+    `/users/${encodeURIComponent(userId)}/following/me`,
+    { token },
+  )
+}
+
 export async function getUserPosts(userId: string) {
   const data = await apiFetch<{ items: ApiPost[] }>(`/users/${userId}/posts`)
   return data.items ?? []
