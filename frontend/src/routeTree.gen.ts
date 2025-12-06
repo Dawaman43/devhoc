@@ -20,11 +20,14 @@ import { Route as AskRouteImport } from './routes/ask'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SnippetsIndexRouteImport } from './routes/snippets/index'
 import { Route as PostsIndexRouteImport } from './routes/posts/index'
+import { Route as CommentsIndexRouteImport } from './routes/comments/index'
 import { Route as SnippetsNewRouteImport } from './routes/snippets/new'
 import { Route as SnippetsSnippetIdRouteImport } from './routes/snippets/$snippetId'
 import { Route as PostsNewRouteImport } from './routes/posts/new'
 import { Route as PostsPostIdRouteImport } from './routes/posts/$postId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as CommentsRepliesRouteImport } from './routes/comments/replies'
+import { Route as CommentsCommentIdRouteImport } from './routes/comments/$commentId'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthAuthTypeRouteImport } from './routes/auth/$authType'
@@ -93,6 +96,11 @@ const PostsIndexRoute = PostsIndexRouteImport.update({
   path: '/posts/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommentsIndexRoute = CommentsIndexRouteImport.update({
+  id: '/comments/',
+  path: '/comments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SnippetsNewRoute = SnippetsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -116,6 +124,16 @@ const PostsPostIdRoute = PostsPostIdRouteImport.update({
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommentsRepliesRoute = CommentsRepliesRouteImport.update({
+  id: '/comments/replies',
+  path: '/comments/replies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommentsCommentIdRoute = CommentsCommentIdRouteImport.update({
+  id: '/comments/$commentId',
+  path: '/comments/$commentId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
@@ -192,11 +210,14 @@ export interface FileRoutesByFullPath {
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/comments/$commentId': typeof CommentsCommentIdRoute
+  '/comments/replies': typeof CommentsRepliesRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
   '/snippets/': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -221,11 +242,14 @@ export interface FileRoutesByTo {
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/comments/$commentId': typeof CommentsCommentIdRoute
+  '/comments/replies': typeof CommentsRepliesRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
   '/snippets': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -252,11 +276,14 @@ export interface FileRoutesById {
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/comments/$commentId': typeof CommentsCommentIdRoute
+  '/comments/replies': typeof CommentsRepliesRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/comments/': typeof CommentsIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/snippets/': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -284,11 +311,14 @@ export interface FileRouteTypes {
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
+    | '/comments/$commentId'
+    | '/comments/replies'
     | '/demo/tanstack-query'
     | '/posts/$postId'
     | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/comments'
     | '/posts'
     | '/snippets/'
     | '/demo/api/names'
@@ -313,11 +343,14 @@ export interface FileRouteTypes {
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
+    | '/comments/$commentId'
+    | '/comments/replies'
     | '/demo/tanstack-query'
     | '/posts/$postId'
     | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/comments'
     | '/posts'
     | '/snippets'
     | '/demo/api/names'
@@ -343,11 +376,14 @@ export interface FileRouteTypes {
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
+    | '/comments/$commentId'
+    | '/comments/replies'
     | '/demo/tanstack-query'
     | '/posts/$postId'
     | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/comments/'
     | '/posts/'
     | '/snippets/'
     | '/demo/api/names'
@@ -371,9 +407,12 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SnippetsRoute: typeof SnippetsRouteWithChildren
   TermsRoute: typeof TermsRoute
+  CommentsCommentIdRoute: typeof CommentsCommentIdRoute
+  CommentsRepliesRoute: typeof CommentsRepliesRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   PostsPostIdRoute: typeof PostsPostIdRoute
   PostsNewRoute: typeof PostsNewRoute
+  CommentsIndexRoute: typeof CommentsIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -464,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comments/': {
+      id: '/comments/'
+      path: '/comments'
+      fullPath: '/comments'
+      preLoaderRoute: typeof CommentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/snippets/new': {
       id: '/snippets/new'
       path: '/new'
@@ -497,6 +543,20 @@ declare module '@tanstack/react-router' {
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comments/replies': {
+      id: '/comments/replies'
+      path: '/comments/replies'
+      fullPath: '/comments/replies'
+      preLoaderRoute: typeof CommentsRepliesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comments/$commentId': {
+      id: '/comments/$commentId'
+      path: '/comments/$commentId'
+      fullPath: '/comments/$commentId'
+      preLoaderRoute: typeof CommentsCommentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/register': {
@@ -637,9 +697,12 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SnippetsRoute: SnippetsRouteWithChildren,
   TermsRoute: TermsRoute,
+  CommentsCommentIdRoute: CommentsCommentIdRoute,
+  CommentsRepliesRoute: CommentsRepliesRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   PostsPostIdRoute: PostsPostIdRoute,
   PostsNewRoute: PostsNewRoute,
+  CommentsIndexRoute: CommentsIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
