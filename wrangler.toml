@@ -1,0 +1,21 @@
+name = "devhoc"
+main = "backend/src/index.ts"
+compatibility_date = "2025-12-06"
+compatibility_flags = ["nodejs_compat"]
+
+account_id = "5b4a15954ce140e738a5cf59f64ce0e9"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "devhoc-db"
+database_id = "2a07789f-680c-467e-baf3-e8dade5cdd78"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "devhoc-bucket"
+
+[observability]
+enabled = true
+
+[dev]
+port = 8788
