@@ -6,11 +6,15 @@ import { useTheme } from '@/components/theme-provider'
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme()
-  const [systemTheme, setSystemTheme] = useState<'dark' | 'light'>('dark')
+  // `systemTheme` is undefined during SSR to avoid relying on `window`.
+  const [systemTheme, setSystemTheme] = useState<'dark' | 'light' | undefined>(
+    undefined,
+  )
+  const [mounted, setMounted] = useState(false)
 
   const getSystemTheme = () =>
     typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
+    window.matchMedia('(prefers-color-scheme: dark)').matches
       ? 'dark'
       : 'light'
 
@@ -19,10 +23,14 @@ export function ModeToggle() {
     if (typeof window === 'undefined') return
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const handler = () => setSystemTheme(mq.matches ? 'dark' : 'light')
-    // Initialize in case of hydration mismatch
+    // Initialize on client only
     handler()
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
+    setMounted(true)
   }, [])
 
   const toggle = () => {
@@ -31,7 +39,10 @@ export function ModeToggle() {
     setTheme(next)
   }
 
-  const effectiveTheme = theme === 'system' ? systemTheme : theme
+  // During SSR (not mounted) we avoid using `systemTheme` so the server
+  // and initial client render stay deterministic.
+  const effectiveTheme =
+    theme === 'system' ? (mounted ? (systemTheme ?? 'light') : 'light') : theme
 
   return (
     <div className="flex items-center gap-2">
