@@ -1,160 +1,95 @@
+import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import { listPosts } from '@/lib/api/posts'
+
 export default function SolvedProblems() {
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ['solved-posts'],
+    queryFn: listPosts,
+  })
+
+  // In a real implementation, you would filter for posts with accepted answers
+  // For now, we'll just show recent posts
+  const recentPosts = posts.slice(0, 3)
+
   return (
     <section className="py-12">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold">Solved problems</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">Recent posts</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Recently accepted answers and canonical solutions
+              Latest questions and discussions from the community
             </p>
           </div>
 
-          <a
-            href="/posts/solved"
+          <Link
+            to="/posts"
             className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-md bg-background border border-border hover:bg-accent hover:text-accent-foreground transition"
-            aria-label="View all solved posts"
           >
             View all
-          </a>
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <article className="relative bg-background border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1">
-            <a
-              href="/posts/10"
-              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-              aria-labelledby="solved-1-title"
-            >
-              <div className="p-4">
-                <div className="flex items-start justify-between">
-                  <h3 id="solved-1-title" className="text-lg font-semibold">
-                    Why my SQL JOIN returns duplicate rows?
-                  </h3>
-                  <span className="inline-flex items-center gap-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                    Accepted
-                  </span>
-                </div>
-
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Clear explanation showing GROUP BY, DISTINCT and proper join
-                  keys. Includes example and final working query.
-                </p>
-
-                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src="/assets/avatar-4.jpg"
-                        alt="Jordan"
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                      <span>Jordan</span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-full bg-muted/40">
-                      sql
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">1.5k views</span>
-                    <span className="flex items-center gap-1">42 answers</span>
-                  </div>
-                </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="relative bg-background border border-border rounded-xl p-4 animate-pulse"
+              >
+                <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                <div className="h-3 bg-muted rounded w-full mb-1" />
+                <div className="h-3 bg-muted rounded w-2/3" />
               </div>
-            </a>
-          </article>
-
-          <article className="relative bg-background border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1">
-            <a
-              href="/posts/11"
-              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-              aria-labelledby="solved-2-title"
-            >
-              <div className="p-4">
-                <div className="flex items-start justify-between">
-                  <h3 id="solved-2-title" className="text-lg font-semibold">
-                    Fixing CORS for embedded sandboxes
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recentPosts.map((post) => (
+              <article
+                key={post.id}
+                className="relative bg-background border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
+              >
+                <Link
+                  to="/posts/$postId"
+                  params={{ postId: post.id }}
+                  className="block p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                >
+                  <h3 className="text-lg font-semibold line-clamp-2">
+                    {post.title}
                   </h3>
-                  <span className="inline-flex items-center gap-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                    Accepted
-                  </span>
-                </div>
 
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Step-by-step solution that configures headers correctly and
-                  shows server + browser checks.
-                </p>
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
+                    {post.content}
+                  </p>
 
-                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src="/assets/avatar-5.jpg"
-                        alt="Riley"
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                      <span>Riley</span>
+                  <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3">
+                      <span>{post.authorName || 'Anonymous'}</span>
+                      {post.tags && post.tags.length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-muted/40">
+                          {post.tags[0]}
+                        </span>
+                      )}
                     </div>
-                    <span className="px-2 py-0.5 rounded-full bg-muted/40">
-                      networking
-                    </span>
-                  </div>
 
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">820 views</span>
-                    <span className="flex items-center gap-1">9 answers</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </article>
-
-          <article className="relative bg-background border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1">
-            <a
-              href="/posts/12"
-              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-              aria-labelledby="solved-3-title"
-            >
-              <div className="p-4">
-                <div className="flex items-start justify-between">
-                  <h3 id="solved-3-title" className="text-lg font-semibold">
-                    Preventing memory leaks in long-running Node processes
-                  </h3>
-                  <span className="inline-flex items-center gap-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                    Accepted
-                  </span>
-                </div>
-
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Diagnose leaks, heap snapshots, and practical fixes including
-                  proper event listener cleanup.
-                </p>
-
-                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src="/assets/avatar-6.jpg"
-                        alt="Casey"
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                      <span>Casey</span>
+                    <div className="flex items-center gap-4">
+                      <span className="flex items-center gap-1">
+                        {post.views || 0} views
+                      </span>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full bg-muted/40">
-                      nodejs
-                    </span>
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">2.4k views</span>
-                    <span className="flex items-center gap-1">76 answers</span>
-                  </div>
-                </div>
+                </Link>
+              </article>
+            ))}
+            {recentPosts.length === 0 && (
+              <div className="col-span-full text-center py-8 text-sm text-muted-foreground">
+                No posts yet. Be the first to create one!
               </div>
-            </a>
-          </article>
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   )

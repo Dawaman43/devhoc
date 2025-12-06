@@ -5,6 +5,8 @@ import { authRoutes } from "./routes/auth";
 import { postsRoutes } from "./routes/posts";
 import { commentsRoutes } from "./routes/comments";
 import { votesRoutes } from "./routes/votes";
+import { usersRoutes } from "./routes/users";
+import { searchRoutes } from "./routes/search";
 
 export type Env = {
   DB: D1Database;
@@ -39,7 +41,7 @@ app.use("*", async (c, next) => {
         id: payload.sub as string,
         role: (payload as any).role,
       };
-    } catch {}
+    } catch { }
   }
   await next();
 });
@@ -51,5 +53,7 @@ app.route("/api/auth", authRoutes());
 app.route("/api/posts", postsRoutes());
 app.route("/api/comments", commentsRoutes());
 app.route("/api/votes", votesRoutes());
+app.route("/api/users", usersRoutes());
+app.route("/api/search", searchRoutes());
 
 export default app;
