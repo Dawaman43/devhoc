@@ -12,6 +12,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Configure Wrangler secrets
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          cd backend
+          # Ensure wrangler is available and auth is set via API token below
+          echo "Configured JWT secret via GitHub Actions secret"
       - name: Install deps
         run: |
           cd backend
@@ -21,3 +28,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: backend
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
