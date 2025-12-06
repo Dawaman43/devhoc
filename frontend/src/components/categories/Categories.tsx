@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 
 const SAMPLE_CATEGORIES = [
   {
@@ -82,8 +83,9 @@ export default function Categories() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <a
-                    href={`/categories/${cat.slug}`}
+                  <Link
+                    to="/categories/$categoriesId"
+                    params={{ categoriesId: cat.slug }}
                     className="inline-flex items-center gap-3"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary font-semibold">
@@ -97,7 +99,7 @@ export default function Categories() {
                         {cat.desc}
                       </p>
                     </div>
-                  </a>
+                  </Link>
                 </div>
 
                 <div className="text-right">

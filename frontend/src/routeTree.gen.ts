@@ -14,13 +14,13 @@ import { Route as SnippetsRouteImport } from './routes/snippets'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AskRouteImport } from './routes/ask'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SnippetsIndexRouteImport } from './routes/snippets/index'
 import { Route as PostsIndexRouteImport } from './routes/posts/index'
 import { Route as CommentsIndexRouteImport } from './routes/comments/index'
+import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
 import { Route as SnippetsNewRouteImport } from './routes/snippets/new'
 import { Route as SnippetsSnippetIdRouteImport } from './routes/snippets/$snippetId'
 import { Route as PostsNewRouteImport } from './routes/posts/new'
@@ -28,6 +28,7 @@ import { Route as PostsPostIdRouteImport } from './routes/posts/$postId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as CommentsRepliesRouteImport } from './routes/comments/replies'
 import { Route as CommentsCommentIdRouteImport } from './routes/comments/$commentId'
+import { Route as CategoriesCategoriesIdRouteImport } from './routes/categories/$categoriesId'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthAuthTypeRouteImport } from './routes/auth/$authType'
@@ -66,11 +67,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CategoriesRoute = CategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -99,6 +95,11 @@ const PostsIndexRoute = PostsIndexRouteImport.update({
 const CommentsIndexRoute = CommentsIndexRouteImport.update({
   id: '/comments/',
   path: '/comments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
+  id: '/categories/',
+  path: '/categories/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SnippetsNewRoute = SnippetsNewRouteImport.update({
@@ -134,6 +135,11 @@ const CommentsRepliesRoute = CommentsRepliesRouteImport.update({
 const CommentsCommentIdRoute = CommentsCommentIdRouteImport.update({
   id: '/comments/$commentId',
   path: '/comments/$commentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesCategoriesIdRoute = CategoriesCategoriesIdRouteImport.update({
+  id: '/categories/$categoriesId',
+  path: '/categories/$categoriesId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
@@ -201,7 +207,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ask': typeof AskRoute
   '/auth': typeof AuthRouteWithChildren
-  '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -210,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/categories/$categoriesId': typeof CategoriesCategoriesIdRoute
   '/comments/$commentId': typeof CommentsCommentIdRoute
   '/comments/replies': typeof CommentsRepliesRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/categories': typeof CategoriesIndexRoute
   '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
   '/snippets/': typeof SnippetsIndexRoute
@@ -234,7 +241,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ask': typeof AskRoute
   '/auth': typeof AuthRouteWithChildren
-  '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -242,6 +248,7 @@ export interface FileRoutesByTo {
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/categories/$categoriesId': typeof CategoriesCategoriesIdRoute
   '/comments/$commentId': typeof CommentsCommentIdRoute
   '/comments/replies': typeof CommentsRepliesRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/categories': typeof CategoriesIndexRoute
   '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
   '/snippets': typeof SnippetsIndexRoute
@@ -267,7 +275,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ask': typeof AskRoute
   '/auth': typeof AuthRouteWithChildren
-  '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -276,6 +283,7 @@ export interface FileRoutesById {
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/categories/$categoriesId': typeof CategoriesCategoriesIdRoute
   '/comments/$commentId': typeof CommentsCommentIdRoute
   '/comments/replies': typeof CommentsRepliesRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/categories/': typeof CategoriesIndexRoute
   '/comments/': typeof CommentsIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/snippets/': typeof SnippetsIndexRoute
@@ -302,7 +311,6 @@ export interface FileRouteTypes {
     | '/'
     | '/ask'
     | '/auth'
-    | '/categories'
     | '/contact'
     | '/pricing'
     | '/privacy'
@@ -311,6 +319,7 @@ export interface FileRouteTypes {
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
+    | '/categories/$categoriesId'
     | '/comments/$commentId'
     | '/comments/replies'
     | '/demo/tanstack-query'
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/categories'
     | '/comments'
     | '/posts'
     | '/snippets/'
@@ -335,7 +345,6 @@ export interface FileRouteTypes {
     | '/'
     | '/ask'
     | '/auth'
-    | '/categories'
     | '/contact'
     | '/pricing'
     | '/privacy'
@@ -343,6 +352,7 @@ export interface FileRouteTypes {
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
+    | '/categories/$categoriesId'
     | '/comments/$commentId'
     | '/comments/replies'
     | '/demo/tanstack-query'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/categories'
     | '/comments'
     | '/posts'
     | '/snippets'
@@ -367,7 +378,6 @@ export interface FileRouteTypes {
     | '/'
     | '/ask'
     | '/auth'
-    | '/categories'
     | '/contact'
     | '/pricing'
     | '/privacy'
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
+    | '/categories/$categoriesId'
     | '/comments/$commentId'
     | '/comments/replies'
     | '/demo/tanstack-query'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/categories/'
     | '/comments/'
     | '/posts/'
     | '/snippets/'
@@ -401,17 +413,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AskRoute: typeof AskRoute
   AuthRoute: typeof AuthRouteWithChildren
-  CategoriesRoute: typeof CategoriesRoute
   ContactRoute: typeof ContactRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   SnippetsRoute: typeof SnippetsRouteWithChildren
   TermsRoute: typeof TermsRoute
+  CategoriesCategoriesIdRoute: typeof CategoriesCategoriesIdRoute
   CommentsCommentIdRoute: typeof CommentsCommentIdRoute
   CommentsRepliesRoute: typeof CommentsRepliesRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   PostsPostIdRoute: typeof PostsPostIdRoute
   PostsNewRoute: typeof PostsNewRoute
+  CategoriesIndexRoute: typeof CategoriesIndexRoute
   CommentsIndexRoute: typeof CommentsIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
@@ -461,13 +474,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/categories': {
-      id: '/categories'
-      path: '/categories'
-      fullPath: '/categories'
-      preLoaderRoute: typeof CategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -508,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/comments'
       fullPath: '/comments'
       preLoaderRoute: typeof CommentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/': {
+      id: '/categories/'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/snippets/new': {
@@ -557,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/comments/$commentId'
       fullPath: '/comments/$commentId'
       preLoaderRoute: typeof CommentsCommentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/$categoriesId': {
+      id: '/categories/$categoriesId'
+      path: '/categories/$categoriesId'
+      fullPath: '/categories/$categoriesId'
+      preLoaderRoute: typeof CategoriesCategoriesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/register': {
@@ -691,17 +711,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AskRoute: AskRoute,
   AuthRoute: AuthRouteWithChildren,
-  CategoriesRoute: CategoriesRoute,
   ContactRoute: ContactRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   SnippetsRoute: SnippetsRouteWithChildren,
   TermsRoute: TermsRoute,
+  CategoriesCategoriesIdRoute: CategoriesCategoriesIdRoute,
   CommentsCommentIdRoute: CommentsCommentIdRoute,
   CommentsRepliesRoute: CommentsRepliesRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   PostsPostIdRoute: PostsPostIdRoute,
   PostsNewRoute: PostsNewRoute,
+  CategoriesIndexRoute: CategoriesIndexRoute,
   CommentsIndexRoute: CommentsIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
