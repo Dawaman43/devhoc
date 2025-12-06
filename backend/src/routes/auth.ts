@@ -29,7 +29,8 @@ export function authRoutes() {
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) return c.json({ error: parsed.error.flatten() }, 400);
     // TODO: check creds
-    const token = jwt.sign(
+    const secret = (c.env && (c.env as any).JWT_SECRET) ?? process.env.JWT_SECRET ?? 'devhoc-dev-secret-change-me'
+    const token = jwt.sign({ sub: 'demo-user-id', role: 'USER' }, secret as string, { expiresIn: '7d' })
       { sub: "demo-user-id", role: "USER" },
       c.env.JWT_SECRET,
       { expiresIn: "7d" }

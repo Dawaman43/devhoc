@@ -24,6 +24,19 @@ npm run dev
 
 Dev server runs at `http://localhost:8787`.
 
+### Using `.env` locally
+
+This project includes a `backend/.env` with development placeholders. To ensure local runs and scripts pick up those values, export them into your shell before starting Wrangler:
+
+```bash
+cd backend
+# load variables into your shell (bash/zsh)
+source .env
+npm run dev
+```
+
+Alternatively, set the values in `wrangler.toml` under `[vars]` for Wrangler to inject into the Worker runtime.
+
 ## Deploy
 
 ```bash
