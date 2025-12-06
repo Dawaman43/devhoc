@@ -1,21 +1,16 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { PostComments, CommentThread } from './PostComments'
-
-export type PostDetailData = {
-  title: string
-  author: string
-  content: string
-  tags?: string[]
-  createdAt?: string
-}
+import { PostComments } from './PostComments'
+import type { ApiComment } from '@/lib/api/comments'
+import type { ApiPost } from '@/lib/api/posts'
+export type PostDetailData = ApiPost
 
 export function PostDetail({
   post,
   comments,
 }: {
   post: PostDetailData
-  comments?: CommentThread[]
+  comments?: ApiComment[]
 }) {
   return (
     <article className="space-y-6">
@@ -27,7 +22,7 @@ export function PostDetail({
                 {post.title}
               </h1>
               <div className="mt-1 text-xs text-muted-foreground">
-                by {post.author}
+                by {post.authorName || 'Anonymous'}
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
                 {!!post.tags?.length &&
@@ -68,10 +63,10 @@ export function PostDetail({
       </div>
 
       <div className="prose dark:prose-invert max-w-none rounded-xl border border-border bg-card p-6">
-        <p>{post.content}</p>
+        <p>{post.content || 'This post does not contain any content yet.'}</p>
       </div>
 
-      <PostComments initialComments={comments ?? []} />
+      <PostComments postId={post.id} initialComments={comments ?? []} />
     </article>
   )
 }

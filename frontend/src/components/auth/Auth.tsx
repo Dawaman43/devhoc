@@ -1,5 +1,6 @@
 import Login from './Login'
 import Register from './Register'
+import { Link } from '@tanstack/react-router'
 
 interface AuthProps {
   authType: 'login' | 'register'
@@ -16,22 +17,16 @@ export default function Auth({ authType }: AuthProps) {
             {authType === 'login' ? (
               <p>
                 Don't have an account?{' '}
-                <a
-                  href="/auth/authType=register"
-                  className="text-primary hover:underline"
-                >
+                <Link to="/auth/register" className="text-primary hover:underline">
                   Create one
-                </a>
+                </Link>
               </p>
             ) : (
               <p>
                 Already have an account?{' '}
-                <a
-                  href="/auth/authType=login"
-                  className="text-primary hover:underline"
-                >
+                <Link to="/auth/login" className="text-primary hover:underline">
                   Sign in
-                </a>
+                </Link>
               </p>
             )}
           </div>

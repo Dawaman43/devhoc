@@ -1,10 +1,15 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { login as loginRequest } from '@/lib/api/auth'
+import { useAuth } from '@/lib/auth/context'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
+  const { login: completeLogin } = useAuth()
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -16,20 +21,9 @@ export default function Login() {
 
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!res.ok) {
-        const text = await res.text().catch(() => res.statusText)
-        throw new Error(text || 'Login failed')
-      }
-
-      // On success, the backend should set a cookie or return session info.
-      // Redirect to home or dashboard.
-      window.location.href = '/'
+      const result = await loginRequest({ email, password })
+      completeLogin(result)
+      navigate({ to: '/' })
     } catch (err: any) {
       setError(err?.message || 'Login failed')
     } finally {

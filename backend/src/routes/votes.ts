@@ -17,7 +17,10 @@ export function votesRoutes() {
     const parsed = voteSchema.safeParse(body);
     if (!parsed.success) return c.json({ error: parsed.error.flatten() }, 400);
     const { targetType, targetId, delta } = parsed.data;
-    const uid = ((c as any).user?.id as string) ?? "anonymous";
+    const uid = ((c as any).user?.id as string) ?? "";
+    if (!uid) {
+      return c.json({ error: "authentication required" }, 401);
+    }
     const id = crypto.randomUUID();
     const value = delta === "up" ? 1 : -1;
     // Try insert; unique(user_id, target_type, target_id) enforces one vote per user per target

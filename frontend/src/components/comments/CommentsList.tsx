@@ -1,16 +1,8 @@
 import { Link } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
+import type { ApiComment } from '@/lib/api/comments'
 
-export type Comment = {
-  id: string
-  postId: string
-  author: string
-  text: string
-  createdAt?: string
-}
-
-export function CommentsList({ comments }: { comments: Comment[] }) {
-  const grouped = comments.reduce<Record<string, Comment[]>>((acc, c) => {
+export function CommentsList({ comments }: { comments: ApiComment[] }) {
+  const grouped = comments.reduce<Record<string, ApiComment[]>>((acc, c) => {
     acc[c.postId] = acc[c.postId] || []
     acc[c.postId].push(c)
     return acc
@@ -55,7 +47,9 @@ export function CommentsList({ comments }: { comments: Comment[] }) {
               {grouped[postId].map((c) => (
                 <div key={c.id} className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="font-medium text-sm">{c.author}</div>
+                    <div className="font-medium text-sm">
+                      {c.authorName || c.authorId || 'Anonymous'}
+                    </div>
                     {c.createdAt && (
                       <div className="text-[10px] text-muted-foreground">
                         {c.createdAt}

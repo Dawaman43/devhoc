@@ -1,8 +1,12 @@
 import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { createPost } from '@/lib/api/posts'
+import { useAuth } from '@/lib/auth/context'
 
 export default function Ask() {
   const [title, setTitle] = useState('')
-  const [body, setBody] = useState('')
+  const [content, setContent] = useState('')
   const [tags, setTags] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{
@@ -10,12 +14,20 @@ export default function Ask() {
     text: string
   } | null>(null)
   const [preview, setPreview] = useState(false)
+  const navigate = useNavigate()
+  const { isAuthenticated, token } = useAuth()
+  const queryClient = useQueryClient()
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setMessage(null)
 
-    if (!title.trim() || !body.trim()) {
+    if (!isAuthenticated) {
+      setMessage({ type: 'error', text: 'Please sign in to submit a question.' })
+      return
+    }
+
+    if (!title.trim() || !content.trim()) {
       setMessage({
         type: 'error',
         text: 'Please provide both a title and a question body.',
@@ -25,7 +37,7 @@ export default function Ask() {
 
     const payload = {
       title: title.trim(),
-      body: body.trim(),
+      content: content.trim(),
       tags: tags
         .split(',')
         .map((t) => t.trim())
@@ -34,22 +46,16 @@ export default function Ask() {
 
     setLoading(true)
     try {
-      const res = await fetch('/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      if (!res.ok) {
-        const errText = await res.text().catch(() => res.statusText)
-        throw new Error(errText || 'Server error')
-      }
-
+      const post = await createPost(payload, token)
       setMessage({ type: 'success', text: 'Question submitted successfully.' })
       setTitle('')
-      setBody('')
+      setContent('')
       setTags('')
       setPreview(false)
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      if (post?.id) {
+        navigate({ to: '/posts/$postId', params: { postId: post.id } })
+      }
     } catch (err: any) {
       setMessage({ type: 'error', text: err?.message || 'Submission failed' })
     } finally {
@@ -66,6 +72,13 @@ export default function Ask() {
             Share a clear, focused question so the community can help. Provide
             code, context and expected outcome where relevant.
           </p>
+
+          {!isAuthenticated && (
+            <div className="mt-4 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+              Please sign in to publish a question. You can draft your content
+              below and submit once logged in.
+            </div>
+          )}
 
           <form onSubmit={submit} className="mt-6 space-y-4">
             <div>
@@ -84,21 +97,21 @@ export default function Ask() {
             </div>
 
             <div>
-              <label htmlFor="body" className="block text-sm font-medium">
+              <label htmlFor="content" className="block text-sm font-medium">
                 Details
               </label>
               <textarea
-                id="body"
-                name="body"
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
+                id="content"
+                name="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 rows={8}
                 className="mt-1 block w-full rounded-md border px-3 py-2 text-sm font-mono"
                 placeholder={`Explain what you tried, include relevant code or error output.`}
                 required
               />
               <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-                <div>{body.length} characters</div>
+                <div>{content.length} characters</div>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -115,7 +128,7 @@ export default function Ask() {
               <div className="rounded border bg-muted p-4 text-sm">
                 <h3 className="font-semibold">Preview</h3>
                 <div className="mt-2 whitespace-pre-wrap">
-                  {body || (
+                  {content || (
                     <em className="text-muted-foreground">
                       Nothing to preview
                     </em>
@@ -141,7 +154,7 @@ export default function Ask() {
             <div className="flex items-center gap-3">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !isAuthenticated}
                 className={`inline-flex items-center rounded bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-60`}
               >
                 {loading ? 'Submitting…' : 'Post question'}
@@ -151,7 +164,7 @@ export default function Ask() {
                 type="button"
                 onClick={() => {
                   setTitle('')
-                  setBody('')
+                  setContent('')
                   setTags('')
                   setMessage(null)
                   setPreview(false)

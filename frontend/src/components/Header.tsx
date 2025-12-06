@@ -1,7 +1,8 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import SearchTab from './Search'
 import { ModeToggle } from './mode-toggle'
+import { useAuth } from '@/lib/auth/context'
 
 const navlinks = [
   { to: '/', label: 'Home' },
@@ -12,6 +13,17 @@ const navlinks = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const navigate = useNavigate()
+  const { isAuthenticated, user, logout } = useAuth()
+  const displayName = user?.name || user?.email || 'Account'
+
+  const handleLogout = () => {
+    logout()
+    navigate({ to: '/' })
+  }
+
+  const closeMenu = () => setMenuOpen(false)
+
   return (
     <header className="sticky top-0 z-50 w-screen border-b border-border bg-linear-to-b from-background/95 to-background/70 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -85,18 +97,41 @@ export default function Header() {
           </div>
           <div className="hidden items-center gap-2 md:flex">
             <ModeToggle />
-            <Link
-              to="/auth/login"
-              className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-            >
-              Continue to app
-            </Link>
-            <Link
-              to="/auth/register"
-              className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
-            >
-              Sign up
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
+                  {displayName}
+                </span>
+                <Link
+                  to="/posts/new"
+                  className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                >
+                  New post
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/auth/login"
+                  className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                >
+                  Continue to app
+                </Link>
+                <Link
+                  to="/auth/register"
+                  className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -105,13 +140,14 @@ export default function Header() {
         <div className="md:hidden">
           <div
             className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
           />
           <div className="fixed left-0 top-0 z-50 h-full w-72 border-r border-border bg-background shadow-lg">
             <div className="flex h-16 items-center justify-between px-4">
               <Link
                 to="/"
                 className="flex items-center gap-2 text-base font-semibold"
+                onClick={closeMenu}
               >
                 <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-bold uppercase text-primary">
                   Devhoc
@@ -121,7 +157,7 @@ export default function Header() {
               <button
                 aria-label="Close menu"
                 className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-accent hover:text-accent-foreground"
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +179,7 @@ export default function Header() {
                   key={link.to}
                   to={link.to}
                   className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={closeMenu}
                   activeProps={{ className: 'bg-primary/10 text-foreground' }}
                 >
                   {link.label}
@@ -155,20 +191,50 @@ export default function Header() {
               <div className="mb-3 flex items-center justify-center">
                 <ModeToggle />
               </div>
-              <Link
-                to="/auth/login"
-                className="inline-flex w-full items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                onClick={() => setMenuOpen(false)}
-              >
-                Continue to app
-              </Link>
-              <Link
-                to="/auth/register"
-                className="mt-2 inline-flex w-full items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
-                onClick={() => setMenuOpen(false)}
-              >
-                Sign up
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <div className="mb-2 rounded-md border border-border px-3 py-2 text-xs text-muted-foreground">
+                    Signed in as{' '}
+                    <span className="font-semibold text-foreground">
+                      {displayName}
+                    </span>
+                  </div>
+                  <Link
+                    to="/posts/new"
+                    className="inline-flex w-full items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+                    onClick={closeMenu}
+                  >
+                    New post
+                  </Link>
+                  <button
+                    type="button"
+                    className="mt-2 inline-flex w-full items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    onClick={() => {
+                      closeMenu()
+                      handleLogout()
+                    }}
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/auth/login"
+                    className="inline-flex w-full items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    onClick={closeMenu}
+                  >
+                    Continue to app
+                  </Link>
+                  <Link
+                    to="/auth/register"
+                    className="mt-2 inline-flex w-full items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+                    onClick={closeMenu}
+                  >
+                    Sign up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

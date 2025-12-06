@@ -3,21 +3,14 @@ import { Input } from '@/components/ui/input'
 import { DropdownMenu } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Link } from '@tanstack/react-router'
+import type { ApiPost } from '@/lib/api/posts'
 
-export type Post = {
-  id: string
-  title: string
-  author: string
-  tags?: string[]
-  createdAt?: string
-}
-
-export function PostsList({ posts }: { posts: Post[] }) {
+export function PostsList({ posts }: { posts: ApiPost[] }) {
   const [query, setQuery] = React.useState('')
   const [sort, setSort] = React.useState<'new' | 'old' | 'title'>('new')
   const filtered = posts
     .filter((p) =>
-      (p.title + p.author + (p.tags?.join(' ') ?? ''))
+      (p.title + (p.authorName ?? '') + (p.tags?.join(' ') ?? ''))
         .toLowerCase()
         .includes(query.toLowerCase()),
     )
@@ -85,7 +78,7 @@ export function PostsList({ posts }: { posts: Post[] }) {
                     {p.title}
                   </Link>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    by {p.author}
+                    by {p.authorName || 'Anonymous'}
                   </div>
                 </div>
                 <div className="text-[10px] text-muted-foreground">

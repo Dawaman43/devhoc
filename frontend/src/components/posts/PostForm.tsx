@@ -1,59 +1,112 @@
 import React from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import { createPost } from '@/lib/api/posts'
+import { useAuth } from '@/lib/auth/context'
 
-export type PostFormData = {
-  title: string
-  author: string
-  content: string
-  tags: string[]
-}
+type PostMessage = { type: 'success' | 'error'; text: string }
 
 export function PostForm() {
   const [title, setTitle] = React.useState(
-    localStorage.getItem('post:title') ?? '',
-  )
-  const [author, setAuthor] = React.useState(
-    localStorage.getItem('post:author') ?? '',
+    typeof window === 'undefined'
+      ? ''
+      : window.localStorage.getItem('post:title') ?? '',
   )
   const [tags, setTags] = React.useState<string[]>(() => {
-    const raw = localStorage.getItem('post:tags')
+    if (typeof window === 'undefined') return []
+    const raw = window.localStorage.getItem('post:tags')
     return raw ? JSON.parse(raw) : []
   })
   const [content, setContent] = React.useState(
-    localStorage.getItem('post:content') ?? '',
+    typeof window === 'undefined'
+      ? ''
+      : window.localStorage.getItem('post:content') ?? '',
   )
+  const [loading, setLoading] = React.useState(false)
+  const [message, setMessage] = React.useState<PostMessage | null>(null)
+  const navigate = useNavigate()
+  const { isAuthenticated, token, user } = useAuth()
+  const queryClient = useQueryClient()
 
   React.useEffect(() => {
-    localStorage.setItem('post:title', title)
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('post:title', title)
   }, [title])
+
   React.useEffect(() => {
-    localStorage.setItem('post:author', author)
-  }, [author])
-  React.useEffect(() => {
-    localStorage.setItem('post:tags', JSON.stringify(tags))
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('post:tags', JSON.stringify(tags))
   }, [tags])
+
   React.useEffect(() => {
-    localStorage.setItem('post:content', content)
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('post:content', content)
   }, [content])
 
   const addTag = (t: string) => {
     const v = t.trim().toLowerCase()
     if (!v) return
-    if (!tags.includes(v)) setTags([...tags, v])
+    setTags((prev) => (prev.includes(v) ? prev : [...prev, v]))
   }
-  const removeTag = (t: string) => setTags(tags.filter((x) => x !== t))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const removeTag = (t: string) => {
+    setTags((prev) => prev.filter((x) => x !== t))
+  }
+
+  const clearDraft = () => {
+    setTitle('')
+    setTags([])
+    setContent('')
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('post:title')
+      window.localStorage.removeItem('post:tags')
+      window.localStorage.removeItem('post:content')
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title || !author || !content) {
-      alert('Please fill out title, author, and content.')
+    setMessage(null)
+
+    if (!isAuthenticated) {
+      setMessage({
+        type: 'error',
+        text: 'Please sign in to publish a post.',
+      })
       return
     }
-    const payload: PostFormData = { title, author, content, tags }
-    console.log('Create post (mock):', payload)
-    alert('Post created (mock)!')
+
+    if (!title.trim() || !content.trim()) {
+      setMessage({
+        type: 'error',
+        text: 'Title and content are required.',
+      })
+      return
+    }
+
+    setLoading(true)
+    try {
+      const post = await createPost(
+        {
+          title: title.trim(),
+          content: content.trim(),
+          tags,
+        },
+        token,
+      )
+      setMessage({ type: 'success', text: 'Post published successfully.' })
+      clearDraft()
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      if (post?.id) {
+        navigate({ to: '/posts/$postId', params: { postId: post.id } })
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err?.message || 'Failed to publish post.' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -67,6 +120,11 @@ export function PostForm() {
           Back to list
         </Link>
       </div>
+      {!isAuthenticated && (
+        <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          Sign in to publish. Your draft is stored locally until you submit.
+        </div>
+      )}
       <div className="grid gap-6 lg:grid-cols-2">
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
@@ -80,21 +138,6 @@ export function PostForm() {
               value={title}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setTitle(e.target.value)
-              }
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <label className="text-sm" htmlFor="author">
-              Author
-            </label>
-            <Input
-              id="author"
-              name="author"
-              placeholder="Your name"
-              value={author}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setAuthor(e.target.value)
               }
               required
             />
@@ -146,27 +189,24 @@ export function PostForm() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <Button type="submit" variant="default" size="sm">
-              Publish
+            <Button type="submit" variant="default" size="sm" disabled={loading || !isAuthenticated}>
+              {loading ? 'Publishing…' : 'Publish'}
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setTitle('')
-                setAuthor('')
-                setTags([])
-                setContent('')
-                localStorage.removeItem('post:title')
-                localStorage.removeItem('post:author')
-                localStorage.removeItem('post:tags')
-                localStorage.removeItem('post:content')
-              }}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={clearDraft}>
               Clear
             </Button>
           </div>
+          {message && (
+            <div
+              className={`rounded-md px-3 py-2 text-sm ${
+                message.type === 'success'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
         </form>
 
         <div className="rounded-xl border border-border bg-card p-4">
@@ -181,7 +221,7 @@ export function PostForm() {
               {title || 'Untitled post'}
             </div>
             <div className="text-xs text-muted-foreground">
-              by {author || 'Anonymous'}
+              by {user?.name || user?.email || 'Anonymous'}
             </div>
             {!!tags.length && (
               <div className="mt-2 flex flex-wrap gap-1">
