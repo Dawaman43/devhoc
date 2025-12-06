@@ -1,19 +1,24 @@
 name = "devhoc-backend"
 main = "src/index.ts"
-compatibility_date = "2024-11-01"
+compatibility_date = "2025-12-06"
+# Keep `nodejs_compat` only for local development if needed. Remove for production builds to avoid polyfills.
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
+# It's safer to provide real secrets via `wrangler secret put` or the Cloudflare dashboard.
 JWT_SECRET = "devhoc-dev-secret-change-me"
+
+account_id = "" # <-- set your Cloudflare Account ID here (or leave blank and set via env)
 
 [[d1_databases]]
 binding = "DB"
 database_name = "devhoc-db"
-database_id = "devhoc-db-id"
+database_id = "2a07789f-680c-467e-baf3-e8dade5cdd78"
 
-[[r2_buckets]]
-binding = "BUCKET"
-bucket_name = "devhoc-uploads"
+# No R2 configured for this account. If you add an R2 bucket later, re-add a [[r2_buckets]] table:
+# [[r2_buckets]]
+# binding = "BUCKET"
+# bucket_name = "your_bucket_name"
 
 [observability]
 enabled = true
