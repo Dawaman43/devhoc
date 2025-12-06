@@ -16,6 +16,7 @@
     "preview:frontend": "npm run -w frontend preview",
     "dev:backend": "npm run -w backend dev",
     "build:backend": "npm run -w backend build",
-    "start:backend": "npm run -w backend start"
+    "start:backend": "npm run -w backend start",
+    "deploy:backend": "npx wrangler deploy --config backend/wrangler.toml"
   }
 }
