@@ -18,5 +18,8 @@
     "build:backend": "npm run -w backend build",
     "start:backend": "npm run -w backend start",
     "deploy:backend": "npx wrangler deploy --config backend/wrangler.toml"
+  },
+  "devDependencies": {
+    "esbuild-linux-64": "^0.15.18"
   }
 }

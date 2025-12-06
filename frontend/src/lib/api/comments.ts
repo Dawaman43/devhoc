@@ -36,3 +36,18 @@ export async function createReply(
     token,
   })
 }
+
+export type PostReplyPayload = {
+  commentId: string
+  parentReplyId?: string
+  text: string
+  author?: string
+}
+
+export async function postReply(
+  payload: PostReplyPayload,
+  token?: string | null,
+) {
+  const { author, ...rest } = payload
+  return createReply(rest, token)
+}
