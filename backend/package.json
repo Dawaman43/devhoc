@@ -10,5 +10,9 @@
     "hono": "^3.0.0",
     "jose": "^5.0.0",
     "wrangler": "^3.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.2025.0",
+    "@types/node": "^20.0.0"
   }
 }
