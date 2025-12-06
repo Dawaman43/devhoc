@@ -244,5 +244,37 @@ export function authRoutes() {
     }
   });
 
+  // OAuth starter route: redirect to provider authorize URL if configured
+  r.get("/oauth/:provider", async (c) => {
+    const { provider } = c.req.param();
+    if (provider === "github") {
+      const clientId =
+        (c.env as any).GITHUB_CLIENT_ID || process.env.GITHUB_CLIENT_ID;
+      const redirectUri =
+        (c.env as any).GITHUB_REDIRECT || process.env.GITHUB_REDIRECT;
+      if (!clientId || !redirectUri)
+        return c.json({ error: "OAuth not configured" }, 501);
+      const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=read:user user:email`;
+      return c.redirect(url);
+    }
+    if (provider === "google") {
+      const clientId =
+        (c.env as any).GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+      const redirectUri =
+        (c.env as any).GOOGLE_REDIRECT || process.env.GOOGLE_REDIRECT;
+      if (!clientId || !redirectUri)
+        return c.json({ error: "OAuth not configured" }, 501);
+      const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid%20email%20profile&access_type=offline`;
+      return c.redirect(url);
+    }
+    return c.json({ error: "provider not supported" }, 400);
+  });
+
+  // OAuth callback stub: exchange code for token (implement per provider)
+  r.get("/oauth/:provider/callback", async (c) => {
+    const { provider } = c.req.param();
+    return c.json({ error: "Not implemented" }, 501);
+  });
+
   return r;
 }

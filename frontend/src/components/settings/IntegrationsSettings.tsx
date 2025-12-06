@@ -16,7 +16,10 @@ export default function IntegrationsSettings() {
               Sign in with GitHub to sync repos and avatars
             </div>
           </div>
-          <a href="#" className="rounded-md border px-3 py-1 text-sm">
+          <a
+            href="/api/auth/oauth/github"
+            className="rounded-md border px-3 py-1 text-sm"
+          >
             Connect
           </a>
         </div>
@@ -28,7 +31,10 @@ export default function IntegrationsSettings() {
               Use Google for authentication
             </div>
           </div>
-          <a href="#" className="rounded-md border px-3 py-1 text-sm">
+          <a
+            href="/api/auth/oauth/google"
+            className="rounded-md border px-3 py-1 text-sm"
+          >
             Connect
           </a>
         </div>

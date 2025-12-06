@@ -25,6 +25,11 @@ import { Route as CommentsIndexRouteImport } from './routes/comments/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
 import { Route as SnippetsNewRouteImport } from './routes/snippets/new'
 import { Route as SnippetsSnippetIdRouteImport } from './routes/snippets/$snippetId'
+import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
+import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
+import { Route as SettingsIntegrationsRouteImport } from './routes/settings/integrations'
+import { Route as SettingsAccountRouteImport } from './routes/settings/account'
 import { Route as PostsNewRouteImport } from './routes/posts/new'
 import { Route as PostsPostIdRouteImport } from './routes/posts/$postId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
@@ -123,6 +128,31 @@ const SnippetsSnippetIdRoute = SnippetsSnippetIdRouteImport.update({
   id: '/$snippetId',
   path: '/$snippetId',
   getParentRoute: () => SnippetsRoute,
+} as any)
+const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsProfileRoute = SettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsIntegrationsRoute = SettingsIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsAccountRoute = SettingsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SettingsRoute,
 } as any)
 const PostsNewRoute = PostsNewRouteImport.update({
   id: '/posts/new',
@@ -223,7 +253,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/snippets': typeof SnippetsRouteWithChildren
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
@@ -235,6 +265,11 @@ export interface FileRoutesByFullPath {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/posts/new': typeof PostsNewRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/integrations': typeof SettingsIntegrationsRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
   '/categories': typeof CategoriesIndexRoute
@@ -259,7 +294,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
@@ -270,6 +305,11 @@ export interface FileRoutesByTo {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/posts/new': typeof PostsNewRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/integrations': typeof SettingsIntegrationsRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
   '/categories': typeof CategoriesIndexRoute
@@ -295,7 +335,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/snippets': typeof SnippetsRouteWithChildren
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
@@ -307,6 +347,11 @@ export interface FileRoutesById {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/posts/new': typeof PostsNewRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/integrations': typeof SettingsIntegrationsRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -345,6 +390,11 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/posts/$postId'
     | '/posts/new'
+    | '/settings/account'
+    | '/settings/integrations'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
     | '/snippets/$snippetId'
     | '/snippets/new'
     | '/categories'
@@ -380,6 +430,11 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/posts/$postId'
     | '/posts/new'
+    | '/settings/account'
+    | '/settings/integrations'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
     | '/snippets/$snippetId'
     | '/snippets/new'
     | '/categories'
@@ -416,6 +471,11 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/posts/$postId'
     | '/posts/new'
+    | '/settings/account'
+    | '/settings/integrations'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
     | '/snippets/$snippetId'
     | '/snippets/new'
     | '/categories/'
@@ -441,7 +501,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
-  SettingsRoute: typeof SettingsRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   SnippetsRoute: typeof SnippetsRouteWithChildren
   TermsRoute: typeof TermsRoute
   CategoriesCategoriesIdRoute: typeof CategoriesCategoriesIdRoute
@@ -576,6 +636,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/snippets/$snippetId'
       preLoaderRoute: typeof SnippetsSnippetIdRouteImport
       parentRoute: typeof SnippetsRoute
+    }
+    '/settings/security': {
+      id: '/settings/security'
+      path: '/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof SettingsSecurityRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/integrations': {
+      id: '/settings/integrations'
+      path: '/integrations'
+      fullPath: '/settings/integrations'
+      preLoaderRoute: typeof SettingsIntegrationsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/account': {
+      id: '/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof SettingsAccountRouteImport
+      parentRoute: typeof SettingsRoute
     }
     '/posts/new': {
       id: '/posts/new'
@@ -720,6 +815,26 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface SettingsRouteChildren {
+  SettingsAccountRoute: typeof SettingsAccountRoute
+  SettingsIntegrationsRoute: typeof SettingsIntegrationsRoute
+  SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsProfileRoute: typeof SettingsProfileRoute
+  SettingsSecurityRoute: typeof SettingsSecurityRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsAccountRoute: SettingsAccountRoute,
+  SettingsIntegrationsRoute: SettingsIntegrationsRoute,
+  SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsProfileRoute: SettingsProfileRoute,
+  SettingsSecurityRoute: SettingsSecurityRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 interface SnippetsSnippetIdRouteChildren {
   SnippetsSnippetIdEditorRoute: typeof SnippetsSnippetIdEditorRoute
 }
@@ -755,7 +870,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
-  SettingsRoute: SettingsRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   SnippetsRoute: SnippetsRouteWithChildren,
   TermsRoute: TermsRoute,
   CategoriesCategoriesIdRoute: CategoriesCategoriesIdRoute,

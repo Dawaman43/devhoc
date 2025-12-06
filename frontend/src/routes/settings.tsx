@@ -1,11 +1,6 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, Link, redirect } from '@tanstack/react-router'
 import { ModeToggle } from '@/components/mode-toggle'
 import { useEffect, useState } from 'react'
-import ProfileEditor from '@/components/profile/ProfileEditor'
-import AccountSettings from '@/components/settings/AccountSettings'
-import SecuritySettings from '@/components/settings/SecuritySettings'
-import NotificationsSettings from '@/components/settings/NotificationsSettings'
-import IntegrationsSettings from '@/components/settings/IntegrationsSettings'
 
 export const Route = createFileRoute('/settings')({
   beforeLoad: () => {
@@ -26,9 +21,6 @@ export const Route = createFileRoute('/settings')({
 })
 
 function Settings() {
-  const [active, setActive] = useState<
-    'profile' | 'account' | 'security' | 'notifications' | 'integrations'
-  >('profile')
   const [font, setFont] = useState<string>(() => {
     if (typeof window === 'undefined') return 'system'
     return localStorage.getItem('devhoc.font') || 'system'
@@ -55,36 +47,41 @@ function Settings() {
       <h1 className="text-3xl font-bold mb-6">Settings</h1>
       <div className="grid gap-6 md:grid-cols-[220px_1fr]">
         <nav className="space-y-2">
-          <button
-            onClick={() => setActive('profile')}
-            className={`w-full text-left rounded-md px-3 py-2 ${active === 'profile' ? 'bg-accent/10' : ''}`}
+          <Link
+            to="/settings/profile"
+            className="w-full block rounded-md px-3 py-2"
+            activeProps={{ className: 'bg-accent/10' }}
           >
             Profile
-          </button>
-          <button
-            onClick={() => setActive('account')}
-            className={`w-full text-left rounded-md px-3 py-2 ${active === 'account' ? 'bg-accent/10' : ''}`}
+          </Link>
+          <Link
+            to="/settings/account"
+            className="w-full block rounded-md px-3 py-2"
+            activeProps={{ className: 'bg-accent/10' }}
           >
             Account
-          </button>
-          <button
-            onClick={() => setActive('security')}
-            className={`w-full text-left rounded-md px-3 py-2 ${active === 'security' ? 'bg-accent/10' : ''}`}
+          </Link>
+          <Link
+            to="/settings/security"
+            className="w-full block rounded-md px-3 py-2"
+            activeProps={{ className: 'bg-accent/10' }}
           >
             Security
-          </button>
-          <button
-            onClick={() => setActive('notifications')}
-            className={`w-full text-left rounded-md px-3 py-2 ${active === 'notifications' ? 'bg-accent/10' : ''}`}
+          </Link>
+          <Link
+            to="/settings/notifications"
+            className="w-full block rounded-md px-3 py-2"
+            activeProps={{ className: 'bg-accent/10' }}
           >
             Notifications
-          </button>
-          <button
-            onClick={() => setActive('integrations')}
-            className={`w-full text-left rounded-md px-3 py-2 ${active === 'integrations' ? 'bg-accent/10' : ''}`}
+          </Link>
+          <Link
+            to="/settings/integrations"
+            className="w-full block rounded-md px-3 py-2"
+            activeProps={{ className: 'bg-accent/10' }}
           >
             Integrations
-          </button>
+          </Link>
 
           <div className="mt-6 p-4 rounded-md border bg-card">
             <h3 className="text-sm font-medium mb-2">Appearance</h3>
@@ -108,11 +105,7 @@ function Settings() {
         </nav>
 
         <main>
-          {active === 'profile' && <ProfileEditor />}
-          {active === 'account' && <AccountSettings />}
-          {active === 'security' && <SecuritySettings />}
-          {active === 'notifications' && <NotificationsSettings />}
-          {active === 'integrations' && <IntegrationsSettings />}
+          <Outlet />
         </main>
       </div>
     </div>
