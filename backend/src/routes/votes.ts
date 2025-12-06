@@ -16,8 +16,20 @@ export function votesRoutes() {
     const body = await c.req.json().catch(() => ({}));
     const parsed = voteSchema.safeParse(body);
     if (!parsed.success) return c.json({ error: parsed.error.flatten() }, 400);
-    // TODO: enforce one vote per user per target in D1
-    return c.json({ ok: true });
+    const { targetType, targetId, delta } = parsed.data;
+    const uid = ((c as any).user?.id as string) ?? "anonymous";
+    const id = crypto.randomUUID();
+    const value = delta === "up" ? 1 : -1;
+    // Try insert; unique(user_id, target_type, target_id) enforces one vote per user per target
+    const res = await c.env.DB.prepare(
+      "INSERT INTO votes (id, user_id, target_type, target_id, value) VALUES (?, ?, ?, ?, ?)"
+    )
+      .bind(id, uid, targetType, targetId, value)
+      .run();
+    if ((res as any).error) {
+      return c.json({ error: "already voted" }, 409);
+    }
+    return c.json({ ok: true, id, value });
   });
 
   return r;

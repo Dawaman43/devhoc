@@ -20,11 +20,37 @@ app.use(
   cors({ origin: "*", allowHeaders: ["Content-Type", "Authorization"] })
 );
 
+// JWT auth middleware: if Authorization header present, decode and attach userId
+app.use("*", async (c, next) => {
+  const auth = c.req.header("Authorization") || "";
+  const token = auth.replace(/^Bearer\s+/i, "");
+  if (token) {
+    try {
+      const secret =
+        (c.env as any)?.JWT_SECRET ||
+        process.env.JWT_SECRET ||
+        "devhoc-dev-secret-change-me";
+      const key = new TextEncoder().encode(secret);
+      const { jwtVerify } = await import("jose");
+      const { payload } = await jwtVerify(token, key, {
+        algorithms: ["HS256"],
+      });
+      // Attach user info for downstream handlers
+      (c as any).user = {
+        id: payload.sub as string,
+        role: (payload as any).role,
+      };
+    } catch {}
+  }
+  await next();
+});
+
 app.get("/health", (c) => c.json({ ok: true, ts: Date.now() }));
 
-app.route("/auth", authRoutes());
-app.route("/posts", postsRoutes());
-app.route("/comments", commentsRoutes());
-app.route("/votes", votesRoutes());
+// Prefix API routes with /api to match frontend fetch paths
+app.route("/api/auth", authRoutes());
+app.route("/api/posts", postsRoutes());
+app.route("/api/comments", commentsRoutes());
+app.route("/api/votes", votesRoutes());
 
 export default app;
