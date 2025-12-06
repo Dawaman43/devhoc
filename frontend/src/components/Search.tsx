@@ -8,8 +8,14 @@ export default function SearchTab() {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    // Replace with real search handling (navigate, filter list, etc.)
-    console.log('Search submitted:', query)
+    // navigate to /search?q=... so the Search page handles the query
+    const url = `/search?q=${encodeURIComponent(query)}`
+    if (typeof window !== 'undefined') {
+      // use history API for SPA navigation
+      window.history.pushState({}, '', url)
+      // dispatch a popstate so the Search page (which listens) can update
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    }
   }
 
   return (
