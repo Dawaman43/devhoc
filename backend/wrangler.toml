@@ -1,0 +1,22 @@
+name = "devhoc-backend"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+JWT_SECRET = "devhoc-dev-secret-change-me"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "devhoc-db"
+database_id = "devhoc-db-id"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "devhoc-uploads"
+
+[observability]
+enabled = true
+
+[dev]
+port = 8787
