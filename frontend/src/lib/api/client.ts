@@ -1,4 +1,7 @@
-const DEFAULT_API_BASE = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "")
+const DEFAULT_API_BASE = (
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://devhoc.dawitthegenius.workers.dev'
+).replace(/\/$/, '')
 
 const ABSOLUTE_URL_REGEX = /^https?:\/\//i
 
@@ -12,25 +15,28 @@ function buildUrl(path: string) {
   }
   const base = DEFAULT_API_BASE
   if (!path) {
-    return base || "/"
+    return base || '/'
   }
-  if (path.startsWith("/")) {
+  if (path.startsWith('/')) {
     return `${base}${path}`
   }
   return `${base}/${path}`
 }
 
-export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  options: ApiFetchOptions = {},
+): Promise<T> {
   const { token, headers, ...rest } = options
   const resolvedUrl = buildUrl(path)
 
   const finalHeaders = new Headers(headers ?? {})
   if (token) {
-    finalHeaders.set("Authorization", `Bearer ${token}`)
+    finalHeaders.set('Authorization', `Bearer ${token}`)
   }
   const isFormData = rest.body instanceof FormData
-  if (rest.body && !isFormData && !finalHeaders.has("Content-Type")) {
-    finalHeaders.set("Content-Type", "application/json")
+  if (rest.body && !isFormData && !finalHeaders.has('Content-Type')) {
+    finalHeaders.set('Content-Type', 'application/json')
   }
 
   const response = await fetch(resolvedUrl, {
@@ -40,11 +46,12 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
 
   if (!response.ok) {
     let message: string | undefined
-    const contentType = response.headers.get("content-type") || ""
-    if (contentType.includes("application/json")) {
+    const contentType = response.headers.get('content-type') || ''
+    if (contentType.includes('application/json')) {
       try {
         const data = await response.json()
-        message = typeof data?.error === "string" ? data.error : JSON.stringify(data)
+        message =
+          typeof data?.error === 'string' ? data.error : JSON.stringify(data)
       } catch {
         // ignore JSON parsing errors
       }
@@ -56,7 +63,9 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
         message = undefined
       }
     }
-    const error = new Error(message || `${response.status} ${response.statusText}`)
+    const error = new Error(
+      message || `${response.status} ${response.statusText}`,
+    )
     ;(error as any).status = response.status
     throw error
   }
@@ -65,8 +74,8 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     return undefined as T
   }
 
-  const contentType = response.headers.get("content-type") || ""
-  if (contentType.includes("application/json")) {
+  const contentType = response.headers.get('content-type') || ''
+  if (contentType.includes('application/json')) {
     return (await response.json()) as T
   }
 
