@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { Share2 } from 'lucide-react'
 import { PostComments } from './PostComments'
 import PostReactions from './PostReactions'
 import type { ApiComment } from '@/lib/api/comments'
@@ -47,11 +48,29 @@ export function PostDetail({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() =>
-                  navigator.clipboard.writeText(window.location.href)
-                }
+                onClick={async () => {
+                  const url =
+                    typeof window !== 'undefined' ? window.location.href : ''
+                  try {
+                    if (
+                      typeof navigator !== 'undefined' &&
+                      (navigator as any).share
+                    ) {
+                      await (navigator as any).share({ title: post.title, url })
+                    } else {
+                      await navigator.clipboard.writeText(url)
+                      // small feedback — use alert as simple fallback
+                      // you can replace with your toast later
+                      // eslint-disable-next-line no-alert
+                      alert('Link copied to clipboard')
+                    }
+                  } catch (e) {
+                    // ignore share errors (user cancel, etc.)
+                  }
+                }}
               >
-                Copy Link
+                <Share2 className="mr-2 h-4 w-4" />
+                Share
               </Button>
               <Link
                 to="/posts"
