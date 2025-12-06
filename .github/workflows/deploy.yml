@@ -12,6 +12,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Check required GitHub secrets
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then echo "ERROR: Missing repository secret CLOUDFLARE_API_TOKEN"; exit 1; fi
+          if [ -z "${{ secrets.JWT_SECRET }}" ]; then echo "ERROR: Missing repository secret JWT_SECRET"; exit 1; fi
       - name: Configure Wrangler secrets
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
