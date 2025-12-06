@@ -1,0 +1,23 @@
+# Node
+node_modules/
+
+# Build
+dist/
+.cache/
+
+# Local env
+.env
+.env.local
+
+# Wrangler / Miniflare
+.wrangler/
+.miniflare/
+
+# Logs
+npm-debug.log*
+logs/
+
+# Editor
+.vscode/
+.idea/
+*.swp
