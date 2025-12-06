@@ -3,6 +3,13 @@ import { useState } from 'react'
 import SearchTab from './Search'
 import { ModeToggle } from './mode-toggle'
 import { useAuth } from '@/lib/auth/context'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const navlinks = [
   { to: '/', label: 'Home' },
@@ -99,28 +106,42 @@ export default function Header() {
             <ModeToggle />
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/profile"
-                  className="rounded-full px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-                >
-                  Profile
-                </Link>
-                <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
-                  {displayName}
-                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-full border border-border px-2 py-1 hover:bg-accent hover:text-accent-foreground">
+                    <Avatar>
+                      {user?.avatarUrl ? (
+                        <AvatarImage src={user.avatarUrl} alt={displayName} />
+                      ) : (
+                        <AvatarFallback>
+                          {(displayName || 'U').slice(0, 1).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {displayName}
+                    </span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings">Settings</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      variant="destructive"
+                    >
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Link
                   to="/posts/new"
                   className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
                 >
                   New post
                 </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-                >
-                  Sign out
-                </button>
               </>
             ) : (
               <>
