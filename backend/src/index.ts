@@ -35,7 +35,6 @@ app.use("*", async (c, next) => {
       const { payload } = await jwtVerify(token, key, {
         algorithms: ["HS256"],
       });
-      // Attach user info for downstream handlers
       (c as any).user = {
         id: payload.sub as string,
         role: (payload as any).role,
