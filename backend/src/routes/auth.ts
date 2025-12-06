@@ -146,6 +146,88 @@ export function authRoutes() {
 
   r.post("/logout", (c) => c.json({ ok: true }));
 
+  r.post("/change-password", async (c) => {
+    const auth = c.req.headers.get("Authorization") || "";
+    const token = auth.replace(/^Bearer\s+/i, "");
+    if (!token) return c.json({ error: "missing token" }, 401);
+    try {
+      const key = getJwtKey((c.env as any)?.JWT_SECRET);
+      const { payload } = await jwtVerify(token, key, {
+        algorithms: ["HS256"],
+      });
+      const userId = payload.sub as string | undefined;
+      if (!userId) return c.json({ error: "invalid token" }, 401);
+
+      const body = await c.req.json().catch(() => ({}));
+      const oldPassword =
+        typeof body.oldPassword === "string" ? body.oldPassword : "";
+      const newPassword =
+        typeof body.newPassword === "string" ? body.newPassword : "";
+      if (!oldPassword || !newPassword || newPassword.length < 8) {
+        return c.json({ error: "invalid payload" }, 400);
+      }
+
+      const row = await c.env.DB.prepare(
+        "SELECT password_hash FROM users WHERE id = ?"
+      )
+        .bind(userId)
+        .first();
+      if (!row) return c.json({ error: "user not found" }, 404);
+      const [salt, stored] = String((row as any).password_hash ?? "").split(
+        ":"
+      );
+      const enc = new TextEncoder();
+      const km = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(oldPassword),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
+      const bits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          hash: "SHA-256",
+          salt: enc.encode(salt),
+          iterations: 100_000,
+        },
+        km,
+        256
+      );
+      const calc = toBase64(bits);
+      if (calc !== stored) return c.json({ error: "invalid credentials" }, 401);
+
+      // compute new hash
+      const newSalt = crypto.randomUUID();
+      const newKm = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(newPassword),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
+      const newBits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          hash: "SHA-256",
+          salt: enc.encode(newSalt),
+          iterations: 100_000,
+        },
+        newKm,
+        256
+      );
+      const newHash = toBase64(newBits);
+      const password_hash = `${newSalt}:${newHash}`;
+
+      await c.env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ?")
+        .bind(password_hash, userId)
+        .run();
+      return c.json({ ok: true });
+    } catch (err) {
+      return c.json({ error: "invalid token" }, 401);
+    }
+  });
+
   // Optional: token introspection helper
   r.get("/me", async (c) => {
     const auth = c.req.headers.get("Authorization") || "";

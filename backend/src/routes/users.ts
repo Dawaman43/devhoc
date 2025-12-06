@@ -119,6 +119,18 @@ export function usersRoutes() {
     return c.json(mapUserRow(row));
   });
 
+  // Delete current user's account
+  r.delete("/me", async (c) => {
+    const user = (c as any).user as { id: string } | undefined;
+    if (!user?.id) return c.json({ error: "missing auth" }, 401);
+
+    // Remove user row. Note: this is a simple delete; related content may remain.
+    await c.env.DB.prepare("DELETE FROM users WHERE id = ?")
+      .bind(user.id)
+      .run();
+    return c.json({ ok: true });
+  });
+
   // Get user profile
   r.get("/:userId", async (c) => {
     const { userId } = c.req.param();
