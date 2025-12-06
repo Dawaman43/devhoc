@@ -1,6 +1,6 @@
 const DEFAULT_API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
-  'https://devhoc.dawitthegenius.workers.dev'
+  'https://devhoc.dawitthegenius.workers.dev/api'
 ).replace(/\/$/, '')
 
 const ABSOLUTE_URL_REGEX = /^https?:\/\//i

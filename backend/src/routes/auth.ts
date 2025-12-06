@@ -22,98 +22,110 @@ export function authRoutes() {
   const r = new Hono<{ Bindings: Env }>();
 
   r.post("/register", async (c) => {
-    const body = await c.req.json().catch(() => ({}));
-    const parsed = registerSchema.safeParse(body);
-    if (!parsed.success) return c.json({ error: parsed.error.flatten() }, 400);
-    const { email, password, name } = parsed.data;
-    const existing = await c.env.DB.prepare(
-      "SELECT id FROM users WHERE email = ?"
-    )
-      .bind(email)
-      .first();
-    if (existing) return c.json({ error: "email already registered" }, 409);
-    const salt = crypto.randomUUID();
-    const enc = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
-      "raw",
-      enc.encode(password),
-      "PBKDF2",
-      false,
-      ["deriveBits"]
-    );
-    const bits = await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        hash: "SHA-256",
-        salt: enc.encode(salt),
-        iterations: 100_000,
-      },
-      keyMaterial,
-      256
-    );
-    const hash = Buffer.from(new Uint8Array(bits)).toString("base64");
-    const password_hash = `${salt}:${hash}`;
-    const id = crypto.randomUUID();
-    await c.env.DB.prepare(
-      "INSERT INTO users (id, email, password_hash, name) VALUES (?, ?, ?, ?)"
-    )
-      .bind(id, email, password_hash, name)
-      .run();
-    return c.json({ id, email, name });
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const parsed = registerSchema.safeParse(body);
+      if (!parsed.success)
+        return c.json({ error: parsed.error.flatten() }, 400);
+      const { email, password, name } = parsed.data;
+      const existing = await c.env.DB.prepare(
+        "SELECT id FROM users WHERE email = ?"
+      )
+        .bind(email)
+        .first();
+      if (existing) return c.json({ error: "email already registered" }, 409);
+      const salt = crypto.randomUUID();
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
+      const bits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          hash: "SHA-256",
+          salt: enc.encode(salt),
+          iterations: 100_000,
+        },
+        keyMaterial,
+        256
+      );
+      const hash = Buffer.from(new Uint8Array(bits)).toString("base64");
+      const password_hash = `${salt}:${hash}`;
+      const id = crypto.randomUUID();
+      await c.env.DB.prepare(
+        "INSERT INTO users (id, email, password_hash, name) VALUES (?, ?, ?, ?)"
+      )
+        .bind(id, email, password_hash, name)
+        .run();
+      return c.json({ id, email, name });
+    } catch (err: any) {
+      console.error("register handler error:", err);
+      return c.json({ error: String(err?.message ?? err) }, 500);
+    }
   });
 
   r.post("/login", async (c) => {
-    const body = await c.req.json().catch(() => ({}));
-    const parsed = loginSchema.safeParse(body);
-    if (!parsed.success) return c.json({ error: parsed.error.flatten() }, 400);
-    const { email, password } = parsed.data;
-    const user = await c.env.DB.prepare(
-      "SELECT id, password_hash, role, name FROM users WHERE email = ?"
-    )
-      .bind(email)
-      .first();
-    if (!user) return c.json({ error: "invalid credentials" }, 401);
-    const [salt, stored] = String(user.password_hash).split(":");
-    const enc = new TextEncoder();
-    const km = await crypto.subtle.importKey(
-      "raw",
-      enc.encode(password),
-      "PBKDF2",
-      false,
-      ["deriveBits"]
-    );
-    const bits = await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        hash: "SHA-256",
-        salt: enc.encode(salt),
-        iterations: 100_000,
-      },
-      km,
-      256
-    );
-    const calc = Buffer.from(new Uint8Array(bits)).toString("base64");
-    if (calc !== stored) return c.json({ error: "invalid credentials" }, 401);
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const parsed = loginSchema.safeParse(body);
+      if (!parsed.success)
+        return c.json({ error: parsed.error.flatten() }, 400);
+      const { email, password } = parsed.data;
+      const user = await c.env.DB.prepare(
+        "SELECT id, password_hash, role, name FROM users WHERE email = ?"
+      )
+        .bind(email)
+        .first();
+      if (!user) return c.json({ error: "invalid credentials" }, 401);
+      const [salt, stored] = String(user.password_hash).split(":");
+      const enc = new TextEncoder();
+      const km = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
+      const bits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          hash: "SHA-256",
+          salt: enc.encode(salt),
+          iterations: 100_000,
+        },
+        km,
+        256
+      );
+      const calc = Buffer.from(new Uint8Array(bits)).toString("base64");
+      if (calc !== stored) return c.json({ error: "invalid credentials" }, 401);
 
-    const alg = "HS256";
-    const key = getJwtKey((c.env as any)?.JWT_SECRET);
+      const alg = "HS256";
+      const key = getJwtKey((c.env as any)?.JWT_SECRET);
 
-    const jwt = await new SignJWT({ role: (user as any).role ?? "USER" })
-      .setProtectedHeader({ alg })
-      .setSubject((user as any).id)
-      .setIssuedAt()
-      .setExpirationTime("7d")
-      .sign(key);
+      const jwt = await new SignJWT({ role: (user as any).role ?? "USER" })
+        .setProtectedHeader({ alg })
+        .setSubject((user as any).id)
+        .setIssuedAt()
+        .setExpirationTime("7d")
+        .sign(key);
 
-    return c.json({
-      token: jwt,
-      user: {
-        id: (user as any).id,
-        email,
-        name: (user as any).name,
-        role: (user as any).role ?? "USER",
-      },
-    });
+      return c.json({
+        token: jwt,
+        user: {
+          id: (user as any).id,
+          email,
+          name: (user as any).name,
+          role: (user as any).role ?? "USER",
+        },
+      });
+    } catch (err: any) {
+      console.error("login handler error:", err);
+      return c.json({ error: String(err?.message ?? err) }, 500);
+    }
   });
 
   r.post("/logout", (c) => c.json({ ok: true }));
