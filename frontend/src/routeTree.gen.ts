@@ -19,8 +19,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AskRouteImport } from './routes/ask'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SnippetsIndexRouteImport } from './routes/snippets/index'
+import { Route as PostsIndexRouteImport } from './routes/posts/index'
 import { Route as SnippetsNewRouteImport } from './routes/snippets/new'
 import { Route as SnippetsSnippetIdRouteImport } from './routes/snippets/$snippetId'
+import { Route as PostsNewRouteImport } from './routes/posts/new'
+import { Route as PostsPostIdRouteImport } from './routes/posts/$postId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -85,6 +88,11 @@ const SnippetsIndexRoute = SnippetsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SnippetsRoute,
 } as any)
+const PostsIndexRoute = PostsIndexRouteImport.update({
+  id: '/posts/',
+  path: '/posts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SnippetsNewRoute = SnippetsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -94,6 +102,16 @@ const SnippetsSnippetIdRoute = SnippetsSnippetIdRouteImport.update({
   id: '/$snippetId',
   path: '/$snippetId',
   getParentRoute: () => SnippetsRoute,
+} as any)
+const PostsNewRoute = PostsNewRouteImport.update({
+  id: '/posts/new',
+  path: '/posts/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostsPostIdRoute = PostsPostIdRouteImport.update({
+  id: '/posts/$postId',
+  path: '/posts/$postId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
@@ -175,8 +193,11 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/posts': typeof PostsIndexRoute
   '/snippets/': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -201,8 +222,11 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/posts': typeof PostsIndexRoute
   '/snippets': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -229,8 +253,11 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/posts/new': typeof PostsNewRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/posts/': typeof PostsIndexRoute
   '/snippets/': typeof SnippetsIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -258,8 +285,11 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/demo/tanstack-query'
+    | '/posts/$postId'
+    | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/posts'
     | '/snippets/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -284,8 +314,11 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/demo/tanstack-query'
+    | '/posts/$postId'
+    | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/posts'
     | '/snippets'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -311,8 +344,11 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/demo/tanstack-query'
+    | '/posts/$postId'
+    | '/posts/new'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/posts/'
     | '/snippets/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -336,6 +372,9 @@ export interface RootRouteChildren {
   SnippetsRoute: typeof SnippetsRouteWithChildren
   TermsRoute: typeof TermsRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  PostsPostIdRoute: typeof PostsPostIdRoute
+  PostsNewRoute: typeof PostsNewRoute
+  PostsIndexRoute: typeof PostsIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -418,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SnippetsIndexRouteImport
       parentRoute: typeof SnippetsRoute
     }
+    '/posts/': {
+      id: '/posts/'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof PostsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/snippets/new': {
       id: '/snippets/new'
       path: '/new'
@@ -431,6 +477,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/snippets/$snippetId'
       preLoaderRoute: typeof SnippetsSnippetIdRouteImport
       parentRoute: typeof SnippetsRoute
+    }
+    '/posts/new': {
+      id: '/posts/new'
+      path: '/posts/new'
+      fullPath: '/posts/new'
+      preLoaderRoute: typeof PostsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posts/$postId': {
+      id: '/posts/$postId'
+      path: '/posts/$postId'
+      fullPath: '/posts/$postId'
+      preLoaderRoute: typeof PostsPostIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
@@ -578,6 +638,9 @@ const rootRouteChildren: RootRouteChildren = {
   SnippetsRoute: SnippetsRouteWithChildren,
   TermsRoute: TermsRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  PostsPostIdRoute: PostsPostIdRoute,
+  PostsNewRoute: PostsNewRoute,
+  PostsIndexRoute: PostsIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

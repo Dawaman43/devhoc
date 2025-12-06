@@ -6,6 +6,7 @@ import { ModeToggle } from './mode-toggle'
 const navlinks = [
   { to: '/', label: 'Home' },
   { to: '/categories', label: 'Categories' },
+  { to: '/posts', label: 'Posts' },
   { to: '/contact', label: 'Contact' },
 ]
 
