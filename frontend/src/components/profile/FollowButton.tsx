@@ -8,6 +8,7 @@ export function FollowButton({ userId }: { userId: string }) {
   const [following, setFollowing] = useState<boolean>(false)
   const [count, setCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
+  const [unavailable, setUnavailable] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -17,14 +18,19 @@ export function FollowButton({ userId }: { userId: string }) {
         if (!mounted) return
         setCount(res?.count ?? 0)
       } catch (e) {
-        // ignore
+        // If the endpoint doesn't exist on the API (404), mark follow as unavailable
+        if (e?.status === 404) {
+          setUnavailable(true)
+        }
       }
       try {
         const me = await isFollowingMe(userId, token ?? null)
         if (!mounted) return
         setFollowing(me?.following ?? false)
       } catch (e) {
-        // ignore
+        if ((e as any)?.status === 404) {
+          setUnavailable(true)
+        }
       }
     }
     load()
@@ -55,6 +61,10 @@ export function FollowButton({ userId }: { userId: string }) {
       }
     } catch (e) {
       console.error('follow toggle error', e)
+      if ((e as any)?.status === 404) {
+        // Feature not available on this API host — hide follow control to avoid noise
+        setUnavailable(true)
+      }
     } finally {
       setLoading(false)
     }
@@ -62,14 +72,16 @@ export function FollowButton({ userId }: { userId: string }) {
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        size="sm"
-        variant={following ? 'secondary' : 'default'}
-        onClick={onToggle}
-        disabled={loading}
-      >
-        {following ? 'Following' : 'Follow'}
-      </Button>
+      {!unavailable && (
+        <Button
+          size="sm"
+          variant={following ? 'secondary' : 'default'}
+          onClick={onToggle}
+          disabled={loading}
+        >
+          {following ? 'Following' : 'Follow'}
+        </Button>
+      )}
       {count !== null && (
         <div className="text-xs text-muted-foreground">
           {count} follower{count === 1 ? '' : 's'}

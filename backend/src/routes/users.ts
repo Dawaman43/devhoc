@@ -91,82 +91,82 @@ export function usersRoutes() {
     if (avatarUrl !== undefined) {
       updates.push("avatar_url = ?");
       params.push(avatarUrl);
-    }
-
-    if (updates.length === 0) {
-      // nothing to do — return current user
-      const row = await c.env.DB.prepare(
-        "SELECT id, email, name, avatar_url, role, reputation, created_at FROM users WHERE id = ?"
+      const rows = await c.env.DB.prepare(
+        `SELECT c.id,
+                c.post_id AS postId,
+                c.author_id AS authorId,
+                COALESCE(u.name, c.author_id) AS authorName,
+                c.text,
+                c.parent_reply_id AS parentReplyId,
+                c.created_at AS createdAt
+           FROM comments c
+           LEFT JOIN users u ON u.id = c.author_id
+           WHERE c.author_id = ?
+           ORDER BY c.created_at DESC
+           LIMIT 50`
       )
-        .bind(user.id)
-        .first<UserRow>();
-      if (!row) return c.json({ error: "user not found" }, 404);
-      return c.json(mapUserRow(row));
-    }
-
-    params.push(user.id);
-    const sql = `UPDATE users SET ${updates.join(", ")} WHERE id = ?`;
-    await c.env.DB.prepare(sql)
-      .bind(...params)
-      .run();
-
-    const row = await c.env.DB.prepare(
-      "SELECT id, email, name, avatar_url, role, reputation, created_at FROM users WHERE id = ?"
-    )
-      .bind(user.id)
-      .first<UserRow>();
-    if (!row) return c.json({ error: "user not found" }, 404);
-    return c.json(mapUserRow(row));
-  });
-
-  // Delete current user's account
-  r.delete("/me", async (c) => {
-    const user = (c as any).user as { id: string } | undefined;
-    if (!user?.id) return c.json({ error: "missing auth" }, 401);
-
-    // Remove user row. Note: this is a simple delete; related content may remain.
-    await c.env.DB.prepare("DELETE FROM users WHERE id = ?")
-      .bind(user.id)
-      .run();
-    return c.json({ ok: true });
-  });
-
-  // Get user profile
-  r.get("/:userId", async (c) => {
-    const { userId } = c.req.param();
-    const user = await c.env.DB.prepare(
-      "SELECT id, email, name, avatar_url, role, reputation, created_at FROM users WHERE id = ?"
-    )
-      .bind(userId)
-      .first<UserRow>();
-    if (!user) return c.json({ error: "user not found" }, 404);
-    return c.json(mapUserRow(user));
-  });
-
-  // Get user's posts
-  r.get("/:userId/posts", async (c) => {
-    const { userId } = c.req.param();
-    const rows = await c.env.DB.prepare(
-      `SELECT p.id,
-              p.title,
-              p.content,
-              p.author_id AS authorId,
-              COALESCE(u.name, p.author_id) AS authorName,
-              p.views,
-              p.created_at AS createdAt,
-              GROUP_CONCAT(pt.tag_id) AS tags
-         FROM posts p
-         LEFT JOIN users u ON u.id = p.author_id
-         LEFT JOIN post_tags pt ON pt.post_id = p.id
-         WHERE p.author_id = ?
-         GROUP BY p.id
-         ORDER BY p.created_at DESC
-         LIMIT 50`
-    )
-      .bind(userId)
-      .all<PostRow>();
-    const items = (rows.results ?? []).map((row) => mapPostRow(row));
+        .bind(userId)
+        .all();
+      return c.json(rows.results ?? []);
     return c.json({ items });
+
+    // Toggle follow/unfollow for a user (authenticated follower follows :userId)
+    r.post('/:userId/follow', async (c) => {
+      const user = (c as any).user as { id: string } | undefined;
+      if (!user?.id) return c.json({ error: 'missing auth' }, 401);
+      const { userId } = c.req.param();
+      if (userId === user.id) return c.json({ error: "can't follow yourself" }, 400);
+      try {
+        const existing = await c.env.DB.prepare(
+          'SELECT id FROM follows WHERE follower_id = ? AND following_id = ?'
+        )
+          .bind(user.id, userId)
+          .first<{ id: string }>();
+        if (existing) {
+          await c.env.DB.prepare('DELETE FROM follows WHERE id = ?').bind(existing.id).run();
+          return c.json({ ok: true, action: 'unfollowed' });
+        }
+        const id = crypto.randomUUID();
+        await c.env.DB.prepare(
+          'INSERT INTO follows (id, follower_id, following_id) VALUES (?, ?, ?)'
+        )
+          .bind(id, user.id, userId)
+          .run();
+        return c.json({ ok: true, action: 'followed', id });
+      } catch (err) {
+        console.error('follow toggle error', err);
+        return c.json({ error: String(err) }, 500);
+      }
+    });
+
+    // Followers count
+    r.get('/:userId/followers/count', async (c) => {
+      const { userId } = c.req.param();
+      const row = await c.env.DB.prepare('SELECT COUNT(1) as cnt FROM follows WHERE following_id = ?')
+        .bind(userId)
+        .first<{ cnt: number }>();
+      return c.json({ count: row?.cnt ?? 0 });
+    });
+
+    // Following count
+    r.get('/:userId/following/count', async (c) => {
+      const { userId } = c.req.param();
+      const row = await c.env.DB.prepare('SELECT COUNT(1) as cnt FROM follows WHERE follower_id = ?')
+        .bind(userId)
+        .first<{ cnt: number }>();
+      return c.json({ count: row?.cnt ?? 0 });
+    });
+
+    // Check if current user follows :userId
+    r.get('/:userId/following/me', async (c) => {
+      const user = (c as any).user as { id: string } | undefined;
+      if (!user?.id) return c.json({ following: false });
+      const { userId } = c.req.param();
+      const row = await c.env.DB.prepare('SELECT id FROM follows WHERE follower_id = ? AND following_id = ?')
+        .bind(user.id, userId)
+        .first<{ id: string }>();
+      return c.json({ following: !!row });
+    });
   });
 
   // Get user's comments

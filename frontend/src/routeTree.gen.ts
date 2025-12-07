@@ -24,6 +24,7 @@ import { Route as SnippetsIndexRouteImport } from './routes/snippets/index'
 import { Route as PostsIndexRouteImport } from './routes/posts/index'
 import { Route as CommentsIndexRouteImport } from './routes/comments/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
+import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
 import { Route as SnippetsNewRouteImport } from './routes/snippets/new'
 import { Route as SnippetsSnippetIdRouteImport } from './routes/snippets/$snippetId'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
@@ -123,6 +124,11 @@ const CommentsIndexRoute = CommentsIndexRouteImport.update({
 const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
   id: '/categories/',
   path: '/categories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersUserIdRoute = UsersUserIdRouteImport.update({
+  id: '/users/$userId',
+  path: '/users/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SnippetsNewRoute = SnippetsNewRouteImport.update({
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/settings/security': typeof SettingsSecurityRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/users/$userId': typeof UsersUserIdRoute
   '/categories': typeof CategoriesIndexRoute
   '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/settings/security': typeof SettingsSecurityRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/users/$userId': typeof UsersUserIdRoute
   '/categories': typeof CategoriesIndexRoute
   '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
@@ -363,6 +371,7 @@ export interface FileRoutesById {
   '/settings/security': typeof SettingsSecurityRoute
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
+  '/users/$userId': typeof UsersUserIdRoute
   '/categories/': typeof CategoriesIndexRoute
   '/comments/': typeof CommentsIndexRoute
   '/posts/': typeof PostsIndexRoute
@@ -407,6 +416,7 @@ export interface FileRouteTypes {
     | '/settings/security'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/users/$userId'
     | '/categories'
     | '/comments'
     | '/posts'
@@ -448,6 +458,7 @@ export interface FileRouteTypes {
     | '/settings/security'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/users/$userId'
     | '/categories'
     | '/comments'
     | '/posts'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/settings/security'
     | '/snippets/$snippetId'
     | '/snippets/new'
+    | '/users/$userId'
     | '/categories/'
     | '/comments/'
     | '/posts/'
@@ -523,6 +535,7 @@ export interface RootRouteChildren {
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   PostsPostIdRoute: typeof PostsPostIdRoute
   PostsNewRoute: typeof PostsNewRoute
+  UsersUserIdRoute: typeof UsersUserIdRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   CommentsIndexRoute: typeof CommentsIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
@@ -641,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/categories'
       fullPath: '/categories'
       preLoaderRoute: typeof CategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users/$userId': {
+      id: '/users/$userId'
+      path: '/users/$userId'
+      fullPath: '/users/$userId'
+      preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/snippets/new': {
@@ -900,6 +920,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   PostsPostIdRoute: PostsPostIdRoute,
   PostsNewRoute: PostsNewRoute,
+  UsersUserIdRoute: UsersUserIdRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   CommentsIndexRoute: CommentsIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
