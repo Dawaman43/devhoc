@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth/context'
 import { updateMyProfile, fetchMyProfile } from '@/lib/api/users'
+import { searchUsers } from '@/lib/api/search'
 import AvatarSelectionModal from './AvatarSelectionModal'
 import { Camera, User, Mail, Globe, FileText } from 'lucide-react'
 
@@ -22,6 +23,10 @@ export default function ProfileEditor() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+  const [usernameStatus, setUsernameStatus] = useState<
+    'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+  >('idle')
+  const usernameDebounceRef = React.useRef<number | null>(null)
 
   useEffect(() => {
     if (!token) return
@@ -39,6 +44,47 @@ export default function ProfileEditor() {
       mounted = false
     }
   }, [token])
+
+  // Live username availability check (debounced)
+  useEffect(() => {
+    if (usernameDebounceRef.current) {
+      window.clearTimeout(usernameDebounceRef.current)
+      usernameDebounceRef.current = null
+    }
+    const uname = username.trim()
+    if (!uname) {
+      setUsernameStatus('idle')
+      return
+    }
+    if (!/^[a-z0-9._-]{2,30}$/.test(uname)) {
+      setUsernameStatus('invalid')
+      return
+    }
+    setUsernameStatus('checking')
+    usernameDebounceRef.current = window.setTimeout(async () => {
+      try {
+        const res = await searchUsers(uname, { limit: 5 })
+        const items = (res as any).items ?? []
+        const found = items.find(
+          (u: any) => (u.username || '').toLowerCase() === uname.toLowerCase(),
+        )
+        if (found && found.id !== user?.id) {
+          setUsernameStatus('taken')
+        } else {
+          setUsernameStatus('available')
+        }
+      } catch (err) {
+        setUsernameStatus('idle')
+      }
+    }, 450)
+
+    return () => {
+      if (usernameDebounceRef.current) {
+        window.clearTimeout(usernameDebounceRef.current)
+        usernameDebounceRef.current = null
+      }
+    }
+  }, [username, user?.id])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -62,6 +108,11 @@ export default function ProfileEditor() {
       return setError(
         'Username may contain letters, numbers, ., _, - and be 2-30 characters',
       )
+    if (uname && usernameStatus === 'taken')
+      return setError('Username already taken')
+    if (usernameStatus === 'invalid') return setError('Invalid username')
+    if (usernameStatus === 'checking')
+      return setError('Checking username availability — please wait')
     setLoading(true)
     try {
       const updated = await updateMyProfile(token, {
@@ -70,6 +121,8 @@ export default function ProfileEditor() {
         avatarUrl: avatarUrl.trim() || undefined,
         username: uname || undefined,
       })
+      // If backend accepted username, update local status
+      if (uname) setUsernameStatus('available')
       setUser(updated)
       setSuccess('Profile updated successfully')
       // Clear success message after 3 seconds
@@ -201,9 +254,25 @@ export default function ProfileEditor() {
                     placeholder="your-username"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Choose a unique username (letters, numbers, ., _, -)
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    Choose a unique username (letters, numbers, ., _, -)
+                  </p>
+                  <div className="text-xs">
+                    {usernameStatus === 'checking' && (
+                      <span className="text-muted-foreground">Checking…</span>
+                    )}
+                    {usernameStatus === 'available' && (
+                      <span className="text-green-600">Available</span>
+                    )}
+                    {usernameStatus === 'taken' && (
+                      <span className="text-destructive">Taken</span>
+                    )}
+                    {usernameStatus === 'invalid' && (
+                      <span className="text-destructive">Invalid</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 

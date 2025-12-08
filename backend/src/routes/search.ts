@@ -123,21 +123,26 @@ export function searchRoutes() {
 
   // Search users
   r.get("/users", async (c) => {
-    const query = c.req.query("q") || "";
-    const limit = parseInt(c.req.query("limit") || "50");
-    let sql = `SELECT id, name, username, avatar_url AS avatarUrl, role, reputation, created_at AS createdAt FROM users`;
-    const bindings: string[] = [];
-    if (query) {
-      sql += ` WHERE name LIKE ? OR email LIKE ? OR username LIKE ?`;
-      const like = `%${query}%`;
-      bindings.push(like, like, like);
+    try {
+      const query = c.req.query("q") || "";
+      const limit = parseInt(c.req.query("limit") || "50");
+      let sql = `SELECT id, name, username, avatar_url AS avatarUrl, role, reputation, created_at AS createdAt FROM users`;
+      const bindings: string[] = [];
+      if (query) {
+        sql += ` WHERE name LIKE ? OR email LIKE ? OR username LIKE ?`;
+        const like = `%${query}%`;
+        bindings.push(like, like, like);
+      }
+      sql += ` ORDER BY name ASC LIMIT ?`;
+      bindings.push(String(limit));
+      let stmt = c.env.DB.prepare(sql);
+      for (const b of bindings) stmt = stmt.bind(b);
+      const rows = await stmt.all();
+      return c.json({ items: rows.results ?? [], query });
+    } catch (err: any) {
+      console.error("search /users error", err?.message ?? err);
+      return c.json({ error: String(err?.message ?? err) }, 500);
     }
-    sql += ` ORDER BY name ASC LIMIT ?`;
-    bindings.push(String(limit));
-    let stmt = c.env.DB.prepare(sql);
-    for (const b of bindings) stmt = stmt.bind(b);
-    const rows = await stmt.all();
-    return c.json({ items: rows.results ?? [], query });
   });
 
   // Inline suggestions (posts titles and user names)
