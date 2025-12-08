@@ -125,11 +125,12 @@ export function searchRoutes() {
   r.get("/users", async (c) => {
     const query = c.req.query("q") || "";
     const limit = parseInt(c.req.query("limit") || "50");
-    let sql = `SELECT id, name, avatar_url AS avatarUrl, role, reputation, created_at AS createdAt FROM users`;
+    let sql = `SELECT id, name, username, avatar_url AS avatarUrl, role, reputation, created_at AS createdAt FROM users`;
     const bindings: string[] = [];
     if (query) {
-      sql += ` WHERE name LIKE ? OR email LIKE ?`;
-      bindings.push(`%${query}%`, `%${query}%`);
+      sql += ` WHERE name LIKE ? OR email LIKE ? OR username LIKE ?`;
+      const like = `%${query}%`;
+      bindings.push(like, like, like);
     }
     sql += ` ORDER BY name ASC LIMIT ?`;
     bindings.push(String(limit));
@@ -150,7 +151,7 @@ export function searchRoutes() {
       .bind(likeQ)
       .all<{ id: string; title: string }>();
     const usersRows = await c.env.DB.prepare(
-      `SELECT id, name FROM users WHERE name LIKE ? ORDER BY name ASC LIMIT 6`
+      `SELECT id, name, username FROM users WHERE name LIKE ? OR username LIKE ? ORDER BY name ASC LIMIT 6`
     )
       .bind(likeQ)
       .all<{ id: string; name: string }>();

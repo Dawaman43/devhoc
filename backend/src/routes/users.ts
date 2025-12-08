@@ -5,6 +5,7 @@ type UserRow = {
   id: string;
   email: string;
   name: string;
+  username?: string | null;
   avatar_url?: string | null;
   role: string;
   reputation: number;
@@ -26,6 +27,7 @@ const mapUserRow = (row: UserRow) => ({
   id: row.id,
   email: row.email,
   name: row.name,
+  username: (row as any).username ?? undefined,
   avatarUrl: row.avatar_url,
   role: row.role,
   reputation: row.reputation,
@@ -44,7 +46,7 @@ export function usersRoutes() {
   r.get("/:userId", async (c) => {
     const { userId } = c.req.param();
     const user = await c.env.DB.prepare(
-      "SELECT id, email, name, avatar_url, role, reputation, created_at FROM users WHERE id = ?"
+      "SELECT id, email, name, username, avatar_url, role, reputation, created_at FROM users WHERE id = ?"
     )
       .bind(userId)
       .first<UserRow>();

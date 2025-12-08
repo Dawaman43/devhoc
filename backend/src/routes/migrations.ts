@@ -69,5 +69,68 @@ export function migrationsRoutes() {
     }
   });
 
+  // Add username column to users and populate unique usernames if missing
+  r.post("/users/add-username", async (c) => {
+    try {
+      const info = await c.env.DB.prepare("PRAGMA table_info('users')").all();
+      const cols = (info.results ?? []).map((r: any) => r.name);
+      if (!cols.includes("username")) {
+        await c.env.DB.prepare(
+          "ALTER TABLE users ADD COLUMN username TEXT"
+        ).run();
+      }
+
+      // Ensure unique index exists (will enforce uniqueness)
+      await c.env.DB.prepare(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)"
+      ).run();
+
+      // Populate missing usernames
+      const rows = await c.env.DB.prepare(
+        "SELECT id, name, email, username FROM users WHERE username IS NULL OR TRIM(username) = ''"
+      ).all();
+      const results = rows.results ?? [];
+      for (const r of results) {
+        const id = r.id as string;
+        const name = String(r.name || "") as string;
+        const email = String(r.email || "") as string;
+
+        // generate base username from name or email local part
+        const sanitize = (s: string) =>
+          s
+            .toLowerCase()
+            .replace(/[^a-z0-9._-]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 28);
+
+        let base = sanitize(name) || sanitize(email.split("@")[0]) || "user";
+        if (!base) base = "user";
+
+        let candidate = base;
+        let suffix = 0;
+        // ensure uniqueness
+        while (true) {
+          const exists = await c.env.DB.prepare(
+            "SELECT id FROM users WHERE username = ? LIMIT 1"
+          )
+            .bind(candidate)
+            .first();
+          if (!exists) break;
+          suffix += 1;
+          candidate = `${base}-${suffix}`;
+        }
+
+        await c.env.DB.prepare("UPDATE users SET username = ? WHERE id = ?")
+          .bind(candidate, id)
+          .run();
+      }
+
+      return c.json({ ok: true, updated: (results || []).length });
+    } catch (err) {
+      console.error("add-username migration error", err);
+      return c.json({ error: String(err) }, 500);
+    }
+  });
+
   return r;
 }

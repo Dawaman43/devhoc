@@ -5,6 +5,7 @@ export type ApiUser = {
   id: string
   email: string
   name: string
+  username?: string | null
   avatarUrl?: string | null
   role: string
   reputation: number

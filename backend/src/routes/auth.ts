@@ -23,6 +23,7 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   name: z.string().min(2),
+  username: z.string().min(2).optional(),
 });
 const loginSchema = z.object({
   email: z.string().email(),
@@ -43,13 +44,30 @@ export function authRoutes() {
       const parsed = registerSchema.safeParse(body);
       if (!parsed.success)
         return c.json({ error: parsed.error.flatten() }, 400);
-      const { email, password, name } = parsed.data;
+      const { email, password, name, username: rawUsername } = parsed.data;
       const existing = await c.env.DB.prepare(
         "SELECT id FROM users WHERE email = ?"
       )
         .bind(email)
         .first();
       if (existing) return c.json({ error: "email already registered" }, 409);
+      // sanitize and optionally validate username uniqueness
+      const sanitize = (s: string) =>
+        s
+          .toLowerCase()
+          .replace(/[^a-z0-9._-]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 30);
+      let username: string | undefined = undefined;
+      if (typeof rawUsername === "string" && rawUsername.trim()) {
+        username = sanitize(rawUsername.trim());
+        const existsU = await c.env.DB.prepare(
+          "SELECT id FROM users WHERE username = ?"
+        )
+          .bind(username)
+          .first();
+        if (existsU) return c.json({ error: "username already taken" }, 409);
+      }
       const salt = crypto.randomUUID();
       const enc = new TextEncoder();
       const keyMaterial = await crypto.subtle.importKey(
@@ -72,11 +90,19 @@ export function authRoutes() {
       const hash = toBase64(bits);
       const password_hash = `${salt}:${hash}`;
       const id = crypto.randomUUID();
-      await c.env.DB.prepare(
-        "INSERT INTO users (id, email, password_hash, name) VALUES (?, ?, ?, ?)"
-      )
-        .bind(id, email, password_hash, name)
-        .run();
+      if (username) {
+        await c.env.DB.prepare(
+          "INSERT INTO users (id, email, password_hash, name, username) VALUES (?, ?, ?, ?, ?)"
+        )
+          .bind(id, email, password_hash, name, username)
+          .run();
+      } else {
+        await c.env.DB.prepare(
+          "INSERT INTO users (id, email, password_hash, name) VALUES (?, ?, ?, ?)"
+        )
+          .bind(id, email, password_hash, name)
+          .run();
+      }
       return c.json({ id, email, name });
     } catch (err: any) {
       console.error("register handler error:", err);
@@ -135,6 +161,7 @@ export function authRoutes() {
           id: (user as any).id,
           email,
           name: (user as any).name,
+          username: (user as any).username ?? undefined,
           role: (user as any).role ?? "USER",
         },
       });
