@@ -8,6 +8,7 @@ import { votesRoutes } from "./routes/votes";
 import { likesRoutes } from "./routes/likes";
 import { migrationsRoutes } from "./routes/migrations";
 import { usersRoutes } from "./routes/users";
+import { teamsRoutes } from "./routes/teams";
 import { searchRoutes } from "./routes/search";
 
 export type Env = {
@@ -59,5 +60,6 @@ app.route("/api/likes", likesRoutes());
 app.route("/api/migrations", migrationsRoutes());
 app.route("/api/users", usersRoutes());
 app.route("/api/search", searchRoutes());
+app.route("/api/teams", teamsRoutes());
 
 export default app;

@@ -93,3 +93,29 @@ CREATE TABLE IF NOT EXISTS notifications (
   read INTEGER DEFAULT 0,
   created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
 );
+
+-- Teams: simple grouping of users
+CREATE TABLE IF NOT EXISTS teams (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  description TEXT,
+  owner_id TEXT,
+  created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+  FOREIGN KEY(owner_id) REFERENCES users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_teams_owner ON teams(owner_id);
+
+-- Team members (many-to-many)
+CREATE TABLE IF NOT EXISTS team_members (
+  id TEXT PRIMARY KEY,
+  team_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  role TEXT DEFAULT 'member',
+  created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+  UNIQUE(team_id, user_id),
+  FOREIGN KEY(team_id) REFERENCES teams(id),
+  FOREIGN KEY(user_id) REFERENCES users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_team_members_team ON team_members(team_id);
+CREATE INDEX IF NOT EXISTS idx_team_members_user ON team_members(user_id);
