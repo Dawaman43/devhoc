@@ -21,5 +21,9 @@
   },
   "devDependencies": {
     "esbuild-linux-64": "^0.15.18"
+  },
+  "dependencies": {
+    "i18next": "^25.7.1",
+    "react-i18next": "^16.4.0"
   }
 }

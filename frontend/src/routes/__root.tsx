@@ -64,6 +64,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
+            __html: `
+          if ('serviceWorker' in navigator) {
+            try {
+              navigator.serviceWorker.register('/sw.js');
+            } catch(e) {
+              // ignore
+            }
+          }
+        `,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `(() => {
   try {
     var key = 'vite-ui-theme';

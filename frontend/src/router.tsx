@@ -6,6 +6,7 @@ import * as TanstackQuery from './integrations/tanstack-query/root-provider'
 import { routeTree } from './routeTree.gen'
 import { ThemeProvider } from './components/theme-provider'
 import { AuthProvider } from '@/lib/auth/context'
+import '@/i18n'
 
 // Create a new router instance
 export const getRouter = () => {

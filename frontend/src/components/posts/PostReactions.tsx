@@ -87,20 +87,55 @@ export function PostReactions({ postId }: { postId: string }) {
   }, [])
 
   const currentIcon = myEmoji ?? '👍'
+  const mainCount =
+    typeof breakdown[currentIcon] === 'number' ? breakdown[currentIcon] : total
+  const counts = EMOJIS.map((e) => ({
+    emoji: e,
+    count: typeof breakdown[e] === 'number' ? breakdown[e] : 0,
+  }))
+  const sorted = counts.slice().sort((a, b) => b.count - a.count)
+  const top = sorted.filter((c) => c.count > 0).slice(0, 3)
+  const sumCounts = counts.reduce((s, c) => s + c.count, 0)
 
   return (
     <div className="relative" ref={containerRef}>
       <div className="flex items-center gap-2">
         <button
-          className={`flex items-center gap-2 rounded-md px-2 py-1 text-sm transition-colors hover:bg-muted/50 ${myEmoji ? 'ring-1 ring-offset-1 ring-primary' : ''}`}
+          className={`flex items-center gap-3 rounded-md px-2 py-1 text-sm transition-colors hover:bg-muted/50 ${myEmoji ? 'ring-1 ring-offset-1 ring-primary' : ''}`}
           onMouseEnter={showPicker}
           onMouseLeave={hidePicker}
           onClick={() => setOpen((s) => !s)}
           aria-haspopup="dialog"
           aria-expanded={open}
         >
-          <span className="text-lg">{currentIcon}</span>
-          <span className="text-xs text-muted-foreground">{total}</span>
+          <div className="flex -space-x-1">
+            {top.length > 0 ? (
+              top.map((t) => (
+                <span
+                  key={t.emoji}
+                  className={`inline-flex items-center justify-center rounded-full border border-border bg-card px-1 text-sm ${myEmoji === t.emoji ? 'ring-1 ring-offset-1 ring-primary' : ''}`}
+                  title={`${t.emoji} ${t.count}`}
+                >
+                  <span className="text-base leading-none">{t.emoji}</span>
+                </span>
+              ))
+            ) : (
+              <span className="inline-flex items-center justify-center rounded-full border border-border bg-card px-1 text-sm">
+                <span className="text-base leading-none">{currentIcon}</span>
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col text-left">
+            <span className="text-xs text-muted-foreground">
+              {sumCounts || total}
+            </span>
+            {myEmoji && (
+              <span className="text-[10px] text-muted-foreground">
+                You reacted {myEmoji}
+              </span>
+            )}
+          </div>
         </button>
       </div>
 
@@ -124,7 +159,7 @@ export function PostReactions({ postId }: { postId: string }) {
               >
                 {e}
                 <div className="text-[10px] text-muted-foreground">
-                  {breakdown[e] ?? ''}
+                  {typeof breakdown[e] === 'number' ? breakdown[e] : 0}
                 </div>
               </button>
             )

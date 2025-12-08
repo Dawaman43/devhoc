@@ -1,5 +1,6 @@
+import React, { Suspense } from 'react'
 import { createFileRoute, useParams, Link } from '@tanstack/react-router'
-import CodeEditor from '@/components/ide/CodeEditor'
+const CodeEditor = React.lazy(() => import('@/components/ide/CodeEditor'))
 
 export const Route = createFileRoute('/snippets/$snippetId')({
   component: () => {
@@ -37,15 +38,23 @@ export const Route = createFileRoute('/snippets/$snippetId')({
           </Link>
         </div>
         <div className="flex-1 min-h-[50vh]">
-          <CodeEditor
-            initialCode={preset.code}
-            language={preset.language}
-            showRun
-            onSave={(code) => {
-              console.log('Save (mock):', snippetId, code)
-              alert('Saved (mock)!')
-            }}
-          />
+          <Suspense
+            fallback={
+              <div className="p-4 text-sm text-muted-foreground">
+                Loading editor…
+              </div>
+            }
+          >
+            <CodeEditor
+              initialCode={preset.code}
+              language={preset.language}
+              showRun
+              onSave={(code) => {
+                console.log('Save (mock):', snippetId, code)
+                alert('Saved (mock)!')
+              }}
+            />
+          </Suspense>
         </div>
       </div>
     )
