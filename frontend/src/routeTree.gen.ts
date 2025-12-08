@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as SnippetsRouteImport } from './routes/snippets'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
@@ -54,6 +55,11 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamsRoute = TeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SnippetsRoute = SnippetsRouteImport.update({
@@ -268,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/snippets': typeof SnippetsRouteWithChildren
+  '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
@@ -310,6 +317,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
+  '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
@@ -354,6 +362,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/snippets': typeof SnippetsRouteWithChildren
+  '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
@@ -399,6 +408,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/snippets'
+    | '/teams'
     | '/terms'
     | '/auth/$authType'
     | '/auth/login'
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/search'
     | '/settings'
+    | '/teams'
     | '/terms'
     | '/auth/$authType'
     | '/auth/login'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/snippets'
+    | '/teams'
     | '/terms'
     | '/auth/$authType'
     | '/auth/login'
@@ -528,6 +540,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SnippetsRoute: typeof SnippetsRouteWithChildren
+  TeamsRoute: typeof TeamsRoute
   TermsRoute: typeof TermsRoute
   CategoriesCategoriesIdRoute: typeof CategoriesCategoriesIdRoute
   CommentsCommentIdRoute: typeof CommentsCommentIdRoute
@@ -556,6 +569,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teams': {
+      id: '/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof TeamsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/snippets': {
@@ -913,6 +933,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SnippetsRoute: SnippetsRouteWithChildren,
+  TeamsRoute: TeamsRoute,
   TermsRoute: TermsRoute,
   CategoriesCategoriesIdRoute: CategoriesCategoriesIdRoute,
   CommentsCommentIdRoute: CommentsCommentIdRoute,
