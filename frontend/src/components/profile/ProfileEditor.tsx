@@ -7,6 +7,7 @@ import { Camera, User, Mail, Globe, FileText } from 'lucide-react'
 export default function ProfileEditor() {
   const { user, token, setUser } = useAuth()
   const [name, setName] = useState(user?.name ?? '')
+  const [username, setUsername] = useState(user?.username ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl ?? '')
   const [bio, setBio] = useState(() => {
@@ -29,10 +30,11 @@ export default function ProfileEditor() {
       .then((data) => {
         if (!mounted) return
         setName(data.name ?? '')
+        setUsername((data as any).username ?? '')
         setEmail(data.email ?? '')
         setAvatarUrl((data as any).avatarUrl ?? '')
       })
-      .catch(() => { })
+      .catch(() => {})
     return () => {
       mounted = false
     }
@@ -55,12 +57,18 @@ export default function ProfileEditor() {
     if (!token) return setError('You must be signed in')
     if (name.trim().length < 2)
       return setError('Full name must be at least 2 characters')
+    const uname = username.trim()
+    if (uname && !/^[a-z0-9._-]{2,30}$/.test(uname))
+      return setError(
+        'Username may contain letters, numbers, ., _, - and be 2-30 characters',
+      )
     setLoading(true)
     try {
       const updated = await updateMyProfile(token, {
         name: name.trim(),
         email: email.trim(),
         avatarUrl: avatarUrl.trim() || undefined,
+        username: uname || undefined,
       })
       setUser(updated)
       setSuccess('Profile updated successfully')
@@ -177,6 +185,26 @@ export default function ProfileEditor() {
                   placeholder="your.email@example.com"
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <User size={16} /> Username
+                </label>
+                <div className="flex">
+                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-sm text-muted-foreground">
+                    @
+                  </span>
+                  <input
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="flex h-10 w-full rounded-r-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none"
+                    placeholder="your-username"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Choose a unique username (letters, numbers, ., _, -)
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-4 pt-4">
@@ -187,7 +215,9 @@ export default function ProfileEditor() {
                   setEmail(user?.email ?? '')
                   setAvatarUrl((user as any)?.avatarUrl ?? '')
                   setBio(localStorage.getItem('devhoc.profile.bio') || '')
-                  setWebsite(localStorage.getItem('devhoc.profile.website') || '')
+                  setWebsite(
+                    localStorage.getItem('devhoc.profile.website') || '',
+                  )
                   setSuccess(null)
                   setError(null)
                 }}

@@ -70,7 +70,12 @@ export async function fetchMyProfile(token: string) {
 
 export async function updateMyProfile(
   token: string,
-  payload: { name?: string; email?: string; avatarUrl?: string },
+  payload: {
+    name?: string
+    email?: string
+    avatarUrl?: string
+    username?: string
+  },
 ) {
   return apiFetch<ApiUser>(`/users/me`, {
     token,

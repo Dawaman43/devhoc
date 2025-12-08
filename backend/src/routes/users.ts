@@ -43,6 +43,97 @@ const mapPostRow = (row: PostRow) => ({
 export function usersRoutes() {
   const r = new Hono<{ Bindings: Env }>();
 
+  // Get current authenticated user's profile
+  r.get("/me", async (c) => {
+    const user = (c as any).user as { id: string } | undefined;
+    if (!user?.id) return c.json({ error: "missing auth" }, 401);
+    const row = await c.env.DB.prepare(
+      "SELECT id, email, name, username, avatar_url, role, reputation, created_at FROM users WHERE id = ?"
+    )
+      .bind(user.id)
+      .first<UserRow>();
+    if (!row) return c.json({ error: "user not found" }, 404);
+    return c.json(mapUserRow(row));
+  });
+
+  // Update current authenticated user's profile
+  r.put("/me", async (c) => {
+    const auth = (c as any).user as { id: string } | undefined;
+    if (!auth?.id) return c.json({ error: "missing auth" }, 401);
+    const body = await c.req.json().catch(() => ({}));
+    const name = typeof body.name === "string" ? body.name.trim() : undefined;
+    const email =
+      typeof body.email === "string" ? body.email.trim() : undefined;
+    const avatarUrl =
+      typeof body.avatarUrl === "string" ? body.avatarUrl.trim() : undefined;
+    const username =
+      typeof body.username === "string" ? body.username.trim() : undefined;
+
+    if (name !== undefined && name.length < 2)
+      return c.json({ error: "invalid name" }, 400);
+
+    // Check email uniqueness
+    if (email) {
+      const ex = await c.env.DB.prepare(
+        "SELECT id FROM users WHERE email = ? AND id != ?"
+      )
+        .bind(email, auth.id)
+        .first();
+      if (ex) return c.json({ error: "email already in use" }, 409);
+    }
+
+    const sanitize = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 30);
+
+    if (username) {
+      const san = sanitize(username);
+      const exu = await c.env.DB.prepare(
+        "SELECT id FROM users WHERE username = ? AND id != ?"
+      )
+        .bind(san, auth.id)
+        .first();
+      if (exu) return c.json({ error: "username already taken" }, 409);
+    }
+
+    const cols: string[] = [];
+    const binds: any[] = [];
+    if (name !== undefined) {
+      cols.push("name = ?");
+      binds.push(name);
+    }
+    if (email !== undefined) {
+      cols.push("email = ?");
+      binds.push(email);
+    }
+    if (avatarUrl !== undefined) {
+      cols.push("avatar_url = ?");
+      binds.push(avatarUrl);
+    }
+    if (username !== undefined) {
+      cols.push("username = ?");
+      binds.push(sanitize(username));
+    }
+
+    if (cols.length === 0) return c.json({ error: "no changes" }, 400);
+
+    binds.push(auth.id);
+    const sql = `UPDATE users SET ${cols.join(", ")} WHERE id = ?`;
+    await c.env.DB.prepare(sql)
+      .bind(...binds)
+      .run();
+
+    const updated = await c.env.DB.prepare(
+      "SELECT id, email, name, username, avatar_url, role, reputation, created_at FROM users WHERE id = ?"
+    )
+      .bind(auth.id)
+      .first<UserRow>();
+    return c.json(mapUserRow(updated as UserRow));
+  });
+
   r.get("/:userId", async (c) => {
     const { userId } = c.req.param();
     const user = await c.env.DB.prepare(
