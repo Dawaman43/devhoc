@@ -21,7 +21,6 @@
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-query": "^5.66.5",
-    "@tanstack/query-persist-client-experimental": "^5.0.0",
     "idb-keyval": "^6.2.1",
     "@tanstack/react-query-devtools": "^5.84.2",
     "@tanstack/react-router": "^1.132.0",
