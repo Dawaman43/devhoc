@@ -6,6 +6,7 @@ import * as TanstackQuery from './integrations/tanstack-query/root-provider'
 import { routeTree } from './routeTree.gen'
 import { ThemeProvider } from './components/theme-provider'
 import { AuthProvider } from '@/lib/auth/context'
+import { useAuth } from '@/lib/auth/context'
 import '@/i18n'
 
 // Create a new router instance
@@ -14,9 +15,10 @@ export const getRouter = () => {
 
   const router = createRouter({
     routeTree,
-    context: { ...rqContext },
+    context: { ...rqContext, auth: undefined as any },
     defaultPreload: 'intent',
     Wrap: (props: { children: React.ReactNode }) => {
+      const auth = useAuth()
       return (
         <TanstackQuery.Provider {...rqContext}>
           <AuthProvider>

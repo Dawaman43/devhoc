@@ -132,5 +132,66 @@ export function migrationsRoutes() {
     }
   });
 
+  // Seed a default admin user if missing
+  r.post("/seed/admin", async (c) => {
+    try {
+      const email = "admin@gmail.com";
+      const existing = await c.env.DB.prepare(
+        "SELECT id FROM users WHERE email = ?"
+      )
+        .bind(email)
+        .first();
+      if (existing) {
+        return c.json({ ok: true, seeded: false, note: "admin exists" });
+      }
+
+      const name = "Admin";
+      const password = "12345678";
+      const salt = crypto.randomUUID();
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
+      const bits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          hash: "SHA-256",
+          salt: enc.encode(salt),
+          iterations: 100_000,
+        },
+        keyMaterial,
+        256
+      );
+      const bytes = new Uint8Array(bits);
+      let binary = "";
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+      }
+      // Use global btoa if available
+      const hash =
+        typeof btoa === "function"
+          ? btoa(binary)
+          : Buffer.from(bytes).toString("base64");
+      const password_hash = `${salt}:${hash}`;
+      const id = crypto.randomUUID();
+      const username = "admin";
+      await c.env.DB.prepare(
+        "INSERT INTO users (id, email, password_hash, name, username, role) VALUES (?, ?, ?, ?, ?, 'ADMIN')"
+      )
+        .bind(id, email, password_hash, name, username)
+        .run();
+
+      return c.json({ ok: true, seeded: true, id, email });
+    } catch (err) {
+      console.error("seed admin error", err);
+      return c.json({ error: String(err) }, 500);
+    }
+  });
+
   return r;
 }

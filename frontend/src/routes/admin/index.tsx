@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, Navigate } from '@tanstack/react-router'
+import { useAuth } from '@/lib/auth/context'
 
 export const Route = createFileRoute('/admin/')({
   component: AdminHome,
@@ -19,9 +20,14 @@ function Card({ title, to }: { title: string; to: string }) {
 }
 
 function AdminHome() {
+  const { user } = useAuth()
+  if (!user || user.role !== 'ADMIN') {
+    return <Navigate to="/auth/login" search={{ redirect: '/admin' }} />
+  }
   return (
     <div className="container mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+      <div className="text-sm">Signed in as: {user?.email}</div>
       <p className="text-muted-foreground">
         Control users, posts, tags, reports, and settings.
       </p>
