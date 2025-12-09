@@ -21,13 +21,67 @@ const mapPostRow = (row: PostRow) => ({
 export function searchRoutes() {
   const r = new Hono<{ Bindings: Env }>();
 
-  // Search posts
+  // Search posts (FTS5 ranking when q provided; fallback to LIKE)
   r.get("/posts", async (c) => {
     const query = c.req.query("q") || "";
     const tag = c.req.query("tag");
-    const sort = c.req.query("sort") || "newest"; // newest, oldest, views, title
+    const sort = c.req.query("sort") || "newest"; // newest, oldest, views, title, relevance
     const limit = parseInt(c.req.query("limit") || "50");
 
+    // If query provided, prefer FTS5 with bm25 ranking
+    if (query.trim().length > 0) {
+      let sql = `SELECT p.id,
+                        p.title,
+                        p.content,
+                        p.author_id AS authorId,
+                        COALESCE(u.name, p.author_id) AS authorName,
+                        p.views,
+                        p.created_at AS createdAt,
+                        GROUP_CONCAT(pt.tag_id) AS tags,
+                        bm25(posts_fts) AS rank
+                   FROM posts_fts
+                   JOIN posts p ON p.id = posts_fts.rowid
+                   LEFT JOIN users u ON u.id = p.author_id
+                   LEFT JOIN post_tags pt ON pt.post_id = p.id
+                   WHERE posts_fts MATCH ?`;
+
+      const bindings: any[] = [query];
+
+      if (tag) {
+        sql += ` AND p.id IN (SELECT post_id FROM post_tags WHERE tag_id = ?)`;
+        bindings.push(tag);
+      }
+
+      sql += ` GROUP BY p.id`;
+
+      switch (sort) {
+        case "oldest":
+          sql += " ORDER BY p.created_at ASC";
+          break;
+        case "views":
+          sql += " ORDER BY p.views DESC";
+          break;
+        case "title":
+          sql += " ORDER BY p.title ASC";
+          break;
+        case "relevance":
+        default:
+          sql += " ORDER BY rank ASC, p.created_at DESC"; // lower bm25 is better
+      }
+
+      sql += ` LIMIT ?`;
+      bindings.push(limit);
+
+      let stmt = c.env.DB.prepare(sql);
+      // D1 supports variadic bind
+      // @ts-ignore
+      stmt = stmt.bind(...bindings);
+      const rows = await stmt.all<PostRow & { rank: number }>();
+      const items = (rows.results ?? []).map((row) => mapPostRow(row));
+      return c.json({ items, query, tag, sort });
+    }
+
+    // Fallback: no query → regular listing + optional tag filter
     let sql = `SELECT p.id,
                       p.title,
                       p.content,
@@ -41,13 +95,7 @@ export function searchRoutes() {
                  LEFT JOIN post_tags pt ON pt.post_id = p.id`;
 
     const conditions: string[] = [];
-    const bindings: string[] = [];
-
-    if (query) {
-      conditions.push("(p.title LIKE ? OR p.content LIKE ?)");
-      const likeQuery = `%${query}%`;
-      bindings.push(likeQuery, likeQuery);
-    }
+    const bindings: any[] = [];
 
     if (tag) {
       sql += ` JOIN post_tags pt2 ON pt2.post_id = p.id`;
@@ -61,7 +109,6 @@ export function searchRoutes() {
 
     sql += ` GROUP BY p.id`;
 
-    // Add sorting
     switch (sort) {
       case "oldest":
         sql += " ORDER BY p.created_at ASC";
@@ -78,13 +125,11 @@ export function searchRoutes() {
     }
 
     sql += ` LIMIT ?`;
-    bindings.push(String(limit));
+    bindings.push(limit);
 
     let stmt = c.env.DB.prepare(sql);
-    for (const binding of bindings) {
-      stmt = stmt.bind(binding);
-    }
-
+    // @ts-ignore
+    stmt = stmt.bind(...bindings);
     const rows = await stmt.all<PostRow>();
     const items = (rows.results ?? []).map((row) => mapPostRow(row));
     return c.json({ items, query, tag, sort });

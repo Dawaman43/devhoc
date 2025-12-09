@@ -22,6 +22,28 @@ CREATE TABLE IF NOT EXISTS posts (
   created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
   FOREIGN KEY(author_id) REFERENCES users(id)
 );
+-- Full-text search index for posts (FTS5)
+-- Uses contentless table with external content `posts`
+CREATE VIRTUAL TABLE IF NOT EXISTS posts_fts USING fts5(
+  title,
+  content,
+  author_id,
+  content='posts',
+  content_rowid='id'
+);
+-- Triggers to keep FTS in sync
+CREATE TRIGGER IF NOT EXISTS posts_ai AFTER INSERT ON posts BEGIN
+  INSERT INTO posts_fts(rowid, title, content, author_id)
+  VALUES (new.id, new.title, new.content, new.author_id);
+END;
+CREATE TRIGGER IF NOT EXISTS posts_ad AFTER DELETE ON posts BEGIN
+  INSERT INTO posts_fts(posts_fts, rowid) VALUES('delete', old.id);
+END;
+CREATE TRIGGER IF NOT EXISTS posts_au AFTER UPDATE ON posts BEGIN
+  INSERT INTO posts_fts(posts_fts, rowid) VALUES('delete', old.id);
+  INSERT INTO posts_fts(rowid, title, content, author_id)
+  VALUES (new.id, new.title, new.content, new.author_id);
+END;
 
 -- Tags
 CREATE TABLE IF NOT EXISTS tags (

@@ -1,11 +1,15 @@
-const CACHE_NAME = 'devhoc-cache-v1'
+const CACHE_NAME = 'devhoc-cache-v2'
 const OFFLINE_URL = '/offline.html'
+const PRECACHE_URLS = ['/', '/manifest.json', '/robots.txt', OFFLINE_URL]
+
+// Simple offline mutation queue (best-effort)
+const mutationQueue = []
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([OFFLINE_URL])
+      return cache.addAll(PRECACHE_URLS)
     }),
   )
 })
@@ -34,12 +38,50 @@ function isNavigationRequest(request) {
 self.addEventListener('fetch', (event) => {
   const { request } = event
 
-  // Always try network for API requests (network-first with fallback to cache)
+  // API requests
   if (request.url.includes('/api/')) {
+    // Queue mutations when offline
+    if (request.method !== 'GET') {
+      event.respondWith(
+        (async () => {
+          try {
+            const res = await fetch(request)
+            return res
+          } catch (e) {
+            // Best-effort: store minimal data to retry later
+            const body = await request
+              .clone()
+              .text()
+              .catch(() => '')
+            mutationQueue.push({
+              url: request.url,
+              method: request.method,
+              headers: [...request.headers],
+              body,
+            })
+            // Notify clients
+            const clientsArr = await self.clients.matchAll()
+            clientsArr.forEach((client) =>
+              client.postMessage({ type: 'mutation-queued', url: request.url }),
+            )
+            // Return a synthetic response
+            return new Response(JSON.stringify({ queued: true }), {
+              status: 202,
+              headers: { 'Content-Type': 'application/json' },
+            })
+          }
+        })(),
+      )
+      return
+    }
+
+    // GET requests: network-first with cache fallback and cache population
     event.respondWith(
       fetch(request)
         .then((res) => {
-          // optionally cache API responses here
+          // cache a copy
+          const resClone = res.clone()
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, resClone))
           return res
         })
         .catch(async () => {
@@ -86,4 +128,22 @@ self.addEventListener('fetch', (event) => {
         .catch(() => caches.match(OFFLINE_URL))
     }),
   )
+})
+
+self.addEventListener('online', async () => {
+  // try flushing queued mutations
+  while (mutationQueue.length > 0) {
+    const next = mutationQueue.shift()
+    try {
+      await fetch(next.url, {
+        method: next.method,
+        headers: next.headers,
+        body: next.body,
+      })
+    } catch (e) {
+      // put back and break
+      mutationQueue.unshift(next)
+      break
+    }
+  }
 })
