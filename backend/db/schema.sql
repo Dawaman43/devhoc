@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE,
   avatar_url TEXT,
   role TEXT DEFAULT 'USER',
+  verified INTEGER DEFAULT 0,
   reputation INTEGER DEFAULT 0,
   created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
 );

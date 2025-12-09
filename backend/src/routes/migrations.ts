@@ -193,5 +193,22 @@ export function migrationsRoutes() {
     }
   });
 
+  // Ensure verified column exists on users (idempotent)
+  r.post("/users/add-verified", async (c) => {
+    try {
+      const info = await c.env.DB.prepare("PRAGMA table_info('users')").all();
+      const cols = (info.results ?? []).map((r: any) => r.name);
+      if (!cols.includes("verified")) {
+        await c.env.DB.prepare(
+          "ALTER TABLE users ADD COLUMN verified INTEGER DEFAULT 0"
+        ).run();
+      }
+      return c.json({ ok: true });
+    } catch (err) {
+      console.error("add-verified migration error", err);
+      return c.json({ error: String(err) }, 500);
+    }
+  });
+
   return r;
 }

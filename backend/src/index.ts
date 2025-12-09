@@ -10,6 +10,7 @@ import { migrationsRoutes } from "./routes/migrations";
 import { usersRoutes } from "./routes/users";
 import { teamsRoutes } from "./routes/teams";
 import { searchRoutes } from "./routes/search";
+import { adminRoutes } from "./routes/admin";
 
 export type Env = {
   DB: D1Database;
@@ -61,5 +62,6 @@ app.route("/api/migrations", migrationsRoutes());
 app.route("/api/users", usersRoutes());
 app.route("/api/search", searchRoutes());
 app.route("/api/teams", teamsRoutes());
+app.route("/api/admin", adminRoutes());
 
 export default app;

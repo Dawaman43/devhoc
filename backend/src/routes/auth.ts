@@ -163,6 +163,7 @@ export function authRoutes() {
           name: (user as any).name,
           username: (user as any).username ?? undefined,
           role: (user as any).role ?? "USER",
+          verified: Number((user as any).verified ?? 0) === 1,
         },
       });
     } catch (err: any) {

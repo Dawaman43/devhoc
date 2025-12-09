@@ -25,6 +25,7 @@ import { Route as SnippetsIndexRouteImport } from './routes/snippets/index'
 import { Route as PostsIndexRouteImport } from './routes/posts/index'
 import { Route as CommentsIndexRouteImport } from './routes/comments/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
 import { Route as SnippetsNewRouteImport } from './routes/snippets/new'
 import { Route as SnippetsSnippetIdRouteImport } from './routes/snippets/$snippetId'
@@ -42,6 +43,11 @@ import { Route as CategoriesCategoriesIdRouteImport } from './routes/categories/
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthAuthTypeRouteImport } from './routes/auth/$authType'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminTagsRouteImport } from './routes/admin/tags'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminReportsRouteImport } from './routes/admin/reports'
+import { Route as AdminPostsRouteImport } from './routes/admin/posts'
 import { Route as SnippetsSnippetIdEditorRouteImport } from './routes/snippets/$snippetId/editor'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -132,6 +138,11 @@ const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
   path: '/categories/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
   id: '/users/$userId',
   path: '/users/$userId',
@@ -217,6 +228,31 @@ const AuthAuthTypeRoute = AuthAuthTypeRouteImport.update({
   path: '/$authType',
   getParentRoute: () => AuthRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTagsRoute = AdminTagsRouteImport.update({
+  id: '/admin/tags',
+  path: '/admin/tags',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPostsRoute = AdminPostsRouteImport.update({
+  id: '/admin/posts',
+  path: '/admin/posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SnippetsSnippetIdEditorRoute = SnippetsSnippetIdEditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -276,6 +312,11 @@ export interface FileRoutesByFullPath {
   '/snippets': typeof SnippetsRouteWithChildren
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
+  '/admin/posts': typeof AdminPostsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -293,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/admin': typeof AdminIndexRoute
   '/categories': typeof CategoriesIndexRoute
   '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
@@ -319,6 +361,11 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRouteWithChildren
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
+  '/admin/posts': typeof AdminPostsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -336,6 +383,7 @@ export interface FileRoutesByTo {
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/admin': typeof AdminIndexRoute
   '/categories': typeof CategoriesIndexRoute
   '/comments': typeof CommentsIndexRoute
   '/posts': typeof PostsIndexRoute
@@ -364,6 +412,11 @@ export interface FileRoutesById {
   '/snippets': typeof SnippetsRouteWithChildren
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
+  '/admin/posts': typeof AdminPostsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/$authType': typeof AuthAuthTypeRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -381,6 +434,7 @@ export interface FileRoutesById {
   '/snippets/$snippetId': typeof SnippetsSnippetIdRouteWithChildren
   '/snippets/new': typeof SnippetsNewRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/comments/': typeof CommentsIndexRoute
   '/posts/': typeof PostsIndexRoute
@@ -410,6 +464,11 @@ export interface FileRouteTypes {
     | '/snippets'
     | '/teams'
     | '/terms'
+    | '/admin/posts'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/tags'
+    | '/admin/users'
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
@@ -427,6 +486,7 @@ export interface FileRouteTypes {
     | '/snippets/$snippetId'
     | '/snippets/new'
     | '/users/$userId'
+    | '/admin'
     | '/categories'
     | '/comments'
     | '/posts'
@@ -453,6 +513,11 @@ export interface FileRouteTypes {
     | '/settings'
     | '/teams'
     | '/terms'
+    | '/admin/posts'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/tags'
+    | '/admin/users'
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
@@ -470,6 +535,7 @@ export interface FileRouteTypes {
     | '/snippets/$snippetId'
     | '/snippets/new'
     | '/users/$userId'
+    | '/admin'
     | '/categories'
     | '/comments'
     | '/posts'
@@ -497,6 +563,11 @@ export interface FileRouteTypes {
     | '/snippets'
     | '/teams'
     | '/terms'
+    | '/admin/posts'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/tags'
+    | '/admin/users'
     | '/auth/$authType'
     | '/auth/login'
     | '/auth/register'
@@ -514,6 +585,7 @@ export interface FileRouteTypes {
     | '/snippets/$snippetId'
     | '/snippets/new'
     | '/users/$userId'
+    | '/admin/'
     | '/categories/'
     | '/comments/'
     | '/posts/'
@@ -542,6 +614,11 @@ export interface RootRouteChildren {
   SnippetsRoute: typeof SnippetsRouteWithChildren
   TeamsRoute: typeof TeamsRoute
   TermsRoute: typeof TermsRoute
+  AdminPostsRoute: typeof AdminPostsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTagsRoute: typeof AdminTagsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   CategoriesCategoriesIdRoute: typeof CategoriesCategoriesIdRoute
   CommentsCommentIdRoute: typeof CommentsCommentIdRoute
   CommentsRepliesRoute: typeof CommentsRepliesRoute
@@ -549,6 +626,7 @@ export interface RootRouteChildren {
   PostsPostIdRoute: typeof PostsPostIdRoute
   PostsNewRoute: typeof PostsNewRoute
   UsersUserIdRoute: typeof UsersUserIdRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   CommentsIndexRoute: typeof CommentsIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
@@ -676,6 +754,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/users/$userId': {
       id: '/users/$userId'
       path: '/users/$userId'
@@ -794,6 +879,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/$authType'
       preLoaderRoute: typeof AuthAuthTypeRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/tags': {
+      id: '/admin/tags'
+      path: '/admin/tags'
+      fullPath: '/admin/tags'
+      preLoaderRoute: typeof AdminTagsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/posts': {
+      id: '/admin/posts'
+      path: '/admin/posts'
+      fullPath: '/admin/posts'
+      preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/snippets/$snippetId/editor': {
       id: '/snippets/$snippetId/editor'
@@ -935,6 +1055,11 @@ const rootRouteChildren: RootRouteChildren = {
   SnippetsRoute: SnippetsRouteWithChildren,
   TeamsRoute: TeamsRoute,
   TermsRoute: TermsRoute,
+  AdminPostsRoute: AdminPostsRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTagsRoute: AdminTagsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   CategoriesCategoriesIdRoute: CategoriesCategoriesIdRoute,
   CommentsCommentIdRoute: CommentsCommentIdRoute,
   CommentsRepliesRoute: CommentsRepliesRoute,
@@ -942,6 +1067,7 @@ const rootRouteChildren: RootRouteChildren = {
   PostsPostIdRoute: PostsPostIdRoute,
   PostsNewRoute: PostsNewRoute,
   UsersUserIdRoute: UsersUserIdRoute,
+  AdminIndexRoute: AdminIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   CommentsIndexRoute: CommentsIndexRoute,
   PostsIndexRoute: PostsIndexRoute,

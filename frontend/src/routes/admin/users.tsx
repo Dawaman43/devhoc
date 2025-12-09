@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, Navigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/lib/auth/context'
+import { adminVerifyUser } from '@/lib/api/users'
 
 export const Route = createFileRoute('/admin/users')({
   beforeLoad: ({ context }) => {
@@ -39,6 +40,8 @@ function UsersAdmin() {
             <th align="left">Username</th>
             <th align="left">Role</th>
             <th align="left">Reputation</th>
+            <th align="left">Verified</th>
+            <th align="left">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -48,6 +51,26 @@ function UsersAdmin() {
               <td>{u.username}</td>
               <td>{u.role}</td>
               <td>{u.reputation}</td>
+              <td>{u.verified ? '✅' : '—'}</td>
+              <td>
+                <button
+                  className="px-2 py-1 border rounded"
+                  onClick={async () => {
+                    try {
+                      const res = await adminVerifyUser(
+                        u.id,
+                        user?.token as any,
+                      )
+                      if (res.ok) {
+                        // naive refresh
+                        location.reload()
+                      }
+                    } catch {}
+                  }}
+                >
+                  {u.verified ? 'Unverify' : 'Verify'}
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

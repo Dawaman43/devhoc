@@ -8,6 +8,7 @@ export type ApiUser = {
   username?: string | null
   avatarUrl?: string | null
   role: string
+  verified?: boolean
   reputation: number
   createdAt: string
 }
@@ -66,6 +67,13 @@ export async function getUserStats(userId: string) {
 
 export async function fetchMyProfile(token: string) {
   return apiFetch<ApiUser>(`/users/me`, { token })
+}
+
+export async function adminVerifyUser(userId: string, token: string) {
+  return apiFetch<{ ok: boolean; verified: boolean }>(
+    `/admin/users/${encodeURIComponent(userId)}/verify`,
+    { method: 'POST', token },
+  )
 }
 
 export async function updateMyProfile(
