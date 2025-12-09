@@ -136,7 +136,12 @@ export function searchRoutes() {
       sql += ` ORDER BY name ASC LIMIT ?`;
       bindings.push(String(limit));
       let stmt = c.env.DB.prepare(sql);
-      for (const b of bindings) stmt = stmt.bind(b);
+      if (bindings.length > 0) {
+        // bind all params in a single call to avoid accidental mismatch
+        // D1 prepare.bind accepts multiple arguments
+        // @ts-ignore
+        stmt = stmt.bind(...bindings);
+      }
       const rows = await stmt.all();
       return c.json({ items: rows.results ?? [], query });
     } catch (err: any) {
