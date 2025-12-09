@@ -25,6 +25,8 @@ export function searchRoutes() {
   r.get("/posts", async (c) => {
     const query = c.req.query("q") || "";
     const tag = c.req.query("tag");
+    const language = c.req.query("language"); // e.g., en, sw, am, yo, ha, ar, fr
+    const difficulty = c.req.query("difficulty"); // beginner | intermediate | advanced
     const sort = c.req.query("sort") || "newest"; // newest, oldest, views, title, relevance
     const limit = parseInt(c.req.query("limit") || "50");
 
@@ -38,7 +40,7 @@ export function searchRoutes() {
                         p.views,
                         p.created_at AS createdAt,
                         GROUP_CONCAT(pt.tag_id) AS tags,
-                        bm25(posts_fts) AS rank
+                        bm25(posts_fts, 1.0, 0.8, 0.2, 0.6, 0.6) AS rank -- weight title, content, author_id, language, difficulty
                    FROM posts_fts
                    JOIN posts p ON p.id = posts_fts.rowid
                    LEFT JOIN users u ON u.id = p.author_id
@@ -50,6 +52,14 @@ export function searchRoutes() {
       if (tag) {
         sql += ` AND p.id IN (SELECT post_id FROM post_tags WHERE tag_id = ?)`;
         bindings.push(tag);
+      }
+      if (language) {
+        sql += ` AND p.language = ?`;
+        bindings.push(language);
+      }
+      if (difficulty) {
+        sql += ` AND p.difficulty = ?`;
+        bindings.push(difficulty);
       }
 
       sql += ` GROUP BY p.id`;
@@ -66,7 +76,8 @@ export function searchRoutes() {
           break;
         case "relevance":
         default:
-          sql += " ORDER BY rank ASC, p.created_at DESC"; // lower bm25 is better
+          // Boost by tag presence to weight topical relevance
+          sql += " ORDER BY rank ASC, p.views DESC, p.created_at DESC"; // lower bm25 is better
       }
 
       sql += ` LIMIT ?`;
@@ -78,7 +89,7 @@ export function searchRoutes() {
       stmt = stmt.bind(...bindings);
       const rows = await stmt.all<PostRow & { rank: number }>();
       const items = (rows.results ?? []).map((row) => mapPostRow(row));
-      return c.json({ items, query, tag, sort });
+      return c.json({ items, query, tag, language, difficulty, sort });
     }
 
     // Fallback: no query → regular listing + optional tag filter
@@ -101,6 +112,14 @@ export function searchRoutes() {
       sql += ` JOIN post_tags pt2 ON pt2.post_id = p.id`;
       conditions.push("pt2.tag_id = ?");
       bindings.push(tag);
+    }
+    if (language) {
+      conditions.push("p.language = ?");
+      bindings.push(language);
+    }
+    if (difficulty) {
+      conditions.push("p.difficulty = ?");
+      bindings.push(difficulty);
     }
 
     if (conditions.length > 0) {
@@ -132,7 +151,7 @@ export function searchRoutes() {
     stmt = stmt.bind(...bindings);
     const rows = await stmt.all<PostRow>();
     const items = (rows.results ?? []).map((row) => mapPostRow(row));
-    return c.json({ items, query, tag, sort });
+    return c.json({ items, query, tag, language, difficulty, sort });
   });
 
   // Get all tags

@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS posts (
   author_id TEXT NOT NULL,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
+  language TEXT DEFAULT 'en', -- ISO code e.g., en, sw, am, yo, ha, ar, fr
+  difficulty TEXT DEFAULT 'beginner', -- beginner | intermediate | advanced
   accepted_comment_id TEXT,
   views INTEGER DEFAULT 0,
   created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
@@ -28,21 +30,23 @@ CREATE VIRTUAL TABLE IF NOT EXISTS posts_fts USING fts5(
   title,
   content,
   author_id,
+  language,
+  difficulty,
   content='posts',
   content_rowid='id'
 );
 -- Triggers to keep FTS in sync
 CREATE TRIGGER IF NOT EXISTS posts_ai AFTER INSERT ON posts BEGIN
-  INSERT INTO posts_fts(rowid, title, content, author_id)
-  VALUES (new.id, new.title, new.content, new.author_id);
+  INSERT INTO posts_fts(rowid, title, content, author_id, language, difficulty)
+  VALUES (new.id, new.title, new.content, new.author_id, new.language, new.difficulty);
 END;
 CREATE TRIGGER IF NOT EXISTS posts_ad AFTER DELETE ON posts BEGIN
   INSERT INTO posts_fts(posts_fts, rowid) VALUES('delete', old.id);
 END;
 CREATE TRIGGER IF NOT EXISTS posts_au AFTER UPDATE ON posts BEGIN
   INSERT INTO posts_fts(posts_fts, rowid) VALUES('delete', old.id);
-  INSERT INTO posts_fts(rowid, title, content, author_id)
-  VALUES (new.id, new.title, new.content, new.author_id);
+  INSERT INTO posts_fts(rowid, title, content, author_id, language, difficulty)
+  VALUES (new.id, new.title, new.content, new.author_id, new.language, new.difficulty);
 END;
 
 -- Tags

@@ -1,28 +1,23 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { persistQueryClient } from '@tanstack/query-persist-client'
-import { createAsyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+import { set, get, del } from 'idb-keyval'
 
-// Async storage persister using IndexedDB via idb-keyval-like interface
-// Falls back to localStorage if IndexedDB unavailable.
+// True IndexedDB persister using idb-keyval
 function createIndexedDbPersister() {
-  const hasIndexedDB = typeof indexedDB !== 'undefined'
-  const storage: Storage | undefined =
-    typeof window !== 'undefined' ? window.localStorage : undefined
-  // Use async storage API backed by localStorage for simplicity; swap with idb-keyval for true IndexedDB if needed.
-  return createAsyncStoragePersister({
-    storage: {
-      getItem: async (key: string) =>
-        hasIndexedDB && storage ? storage.getItem(key) : null,
-      setItem: async (key: string, value: string) => {
-        if (hasIndexedDB && storage) storage.setItem(key, value)
-      },
-      removeItem: async (key: string) => {
-        if (hasIndexedDB && storage) storage.removeItem(key)
-      },
+  const key = 'devhoc-query-cache'
+  return {
+    persistClient: async (client: unknown) => {
+      const value = JSON.stringify(client)
+      await set(key, value)
     },
-    key: 'devhoc-query-cache',
-    throttleTime: 1000,
-  })
+    restoreClient: async () => {
+      const value = await get<string | null>(key)
+      return value ? JSON.parse(value) : undefined
+    },
+    removeClient: async () => {
+      await del(key)
+    },
+  }
 }
 
 export function getContext() {
