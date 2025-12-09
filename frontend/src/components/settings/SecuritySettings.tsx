@@ -10,7 +10,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { apiFetch } from '@/lib/api/client'
-import { useState } from 'react'
 
 export default function SecuritySettings() {
   const { token, logout } = useAuth()
