@@ -9,7 +9,7 @@ function AdminSettings() {
   const { user } = useAuth()
   if (!user || user.role !== 'ADMIN') {
     return (
-      <Navigate to="/auth/login" search={{ redirect: '/admin/settings' }} />
+      <Navigate to="/admin/login" search={{ redirect: '/admin/settings' }} />
     )
   }
   return (

@@ -1,4 +1,9 @@
-import { createFileRoute, Link, Navigate } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  Navigate,
+  useNavigate,
+} from '@tanstack/react-router'
 import { useAuth } from '@/lib/auth/context'
 import { login } from '@/lib/api/auth'
 import React from 'react'
@@ -9,6 +14,7 @@ export const Route = createFileRoute('/admin/login')({
 
 function AdminLogin() {
   const { isAuthenticated, user, login: setAuth } = useAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = React.useState('admin@gmail.com')
   const [password, setPassword] = React.useState('12345678')
   const [error, setError] = React.useState<string | null>(null)
@@ -26,6 +32,15 @@ function AdminLogin() {
       const res = await login({ email, password })
       if (res?.token && res?.user?.role === 'ADMIN') {
         setAuth(res)
+        // after successful admin auth, navigate to redirect or /admin
+        try {
+          const params = new URLSearchParams(window.location.search)
+          const redirect = params.get('redirect') || '/admin'
+          navigate({ to: redirect })
+        } catch {
+          // fallback
+          navigate({ to: '/admin' })
+        }
       } else {
         setError('Not an admin account')
       }

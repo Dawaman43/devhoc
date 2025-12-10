@@ -1,24 +1,15 @@
-import { createFileRoute, redirect, Navigate } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/lib/auth/context'
 
 export const Route = createFileRoute('/admin/posts')({
-  beforeLoad: ({ context }) => {
-    const user = context?.auth?.user
-    if (!user || user.role !== 'ADMIN') {
-      throw redirect({
-        to: '/auth/login',
-        search: { redirect: '/admin/posts' },
-      })
-    }
-  },
   component: PostsAdmin,
 })
 
 function PostsAdmin() {
   const { user } = useAuth()
   if (!user || user.role !== 'ADMIN') {
-    return <Navigate to="/auth/login" search={{ redirect: '/admin/posts' }} />
+    return <Navigate to="/admin/login" search={{ redirect: '/admin/posts' }} />
   }
   const { data } = useQuery({
     queryKey: ['admin-posts'],

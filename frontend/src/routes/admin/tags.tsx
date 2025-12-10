@@ -1,21 +1,15 @@
-import { createFileRoute, redirect, Navigate } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/lib/auth/context'
 
 export const Route = createFileRoute('/admin/tags')({
-  beforeLoad: ({ context }) => {
-    const user = context?.auth?.user
-    if (!user || user.role !== 'ADMIN') {
-      throw redirect({ to: '/auth/login', search: { redirect: '/admin/tags' } })
-    }
-  },
   component: TagsAdmin,
 })
 
 function TagsAdmin() {
   const { user } = useAuth()
   if (!user || user.role !== 'ADMIN') {
-    return <Navigate to="/auth/login" search={{ redirect: '/admin/tags' }} />
+    return <Navigate to="/admin/login" search={{ redirect: '/admin/tags' }} />
   }
   const { data } = useQuery({
     queryKey: ['admin-tags'],

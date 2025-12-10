@@ -1,23 +1,14 @@
-import { createFileRoute, redirect, Navigate } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useAuth } from '@/lib/auth/context'
 
 export const Route = createFileRoute('/admin/reports')({
-  beforeLoad: ({ context }) => {
-    const user = context?.auth?.user
-    if (!user || user.role !== 'ADMIN') {
-      throw redirect({
-        to: '/auth/login',
-        search: { redirect: '/admin/reports' },
-      })
-    }
-  },
   component: ReportsAdmin,
 })
 
 function ReportsAdmin() {
   const { user } = useAuth()
   if (!user || user.role !== 'ADMIN') {
-    return <Navigate to="/auth/login" search={{ redirect: '/admin/reports' }} />
+    return <Navigate to="/admin/login" search={{ redirect: '/admin/reports' }} />
   }
   return (
     <div className="container mx-auto p-4">

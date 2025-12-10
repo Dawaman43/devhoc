@@ -22,7 +22,7 @@ function Card({ title, to }: { title: string; to: string }) {
 function AdminHome() {
   const { user } = useAuth()
   if (!user || user.role !== 'ADMIN') {
-    return <Navigate to="/auth/login" search={{ redirect: '/admin' }} />
+    return <Navigate to="/admin/login" search={{ redirect: '/admin' }} />
   }
   return (
     <div className="container mx-auto p-4 space-y-4">

@@ -48,6 +48,7 @@ import { Route as AdminTagsRouteImport } from './routes/admin/tags'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminPostsRouteImport } from './routes/admin/posts'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as SnippetsSnippetIdEditorRouteImport } from './routes/snippets/$snippetId/editor'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -253,6 +254,11 @@ const AdminPostsRoute = AdminPostsRouteImport.update({
   path: '/admin/posts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SnippetsSnippetIdEditorRoute = SnippetsSnippetIdEditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -312,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/snippets': typeof SnippetsRouteWithChildren
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -361,6 +368,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRouteWithChildren
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -412,6 +420,7 @@ export interface FileRoutesById {
   '/snippets': typeof SnippetsRouteWithChildren
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -464,6 +473,7 @@ export interface FileRouteTypes {
     | '/snippets'
     | '/teams'
     | '/terms'
+    | '/admin/login'
     | '/admin/posts'
     | '/admin/reports'
     | '/admin/settings'
@@ -513,6 +523,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/teams'
     | '/terms'
+    | '/admin/login'
     | '/admin/posts'
     | '/admin/reports'
     | '/admin/settings'
@@ -563,6 +574,7 @@ export interface FileRouteTypes {
     | '/snippets'
     | '/teams'
     | '/terms'
+    | '/admin/login'
     | '/admin/posts'
     | '/admin/reports'
     | '/admin/settings'
@@ -614,6 +626,7 @@ export interface RootRouteChildren {
   SnippetsRoute: typeof SnippetsRouteWithChildren
   TeamsRoute: typeof TeamsRoute
   TermsRoute: typeof TermsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AdminPostsRoute: typeof AdminPostsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -915,6 +928,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPostsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/snippets/$snippetId/editor': {
       id: '/snippets/$snippetId/editor'
       path: '/editor'
@@ -1055,6 +1075,7 @@ const rootRouteChildren: RootRouteChildren = {
   SnippetsRoute: SnippetsRouteWithChildren,
   TeamsRoute: TeamsRoute,
   TermsRoute: TermsRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AdminPostsRoute: AdminPostsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
